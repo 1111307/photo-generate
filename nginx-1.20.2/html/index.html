@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片文字合成系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e0e0e0;
+        }
+
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 30px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .preview {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .preview-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .preview-item .text {
+            padding: 10px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .export-btn {
+            margin-top: 20px;
+            background: #27ae60;
+        }
+
+        .export-btn:hover {
+            background: #219a52;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>图片文字合成系统</h1>
+        <div class="user-info">
+            <span id="username"></span>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('single')">单次生成</button>
+            <button class="tab" onclick="switchTab('batch')">批量生成</button>
+            <button class="tab" onclick="switchTab('excel')">Excel上传</button>
+        </div>
+
+        <div class="content">
+            <div class="message" id="message"></div>
+
+            <!-- 单次生成 -->
+            <div id="single-tab">
+                <div class="form-group">
+                    <label for="template-select">选择模板</label>
+                    <select id="template-select"></select>
+                </div>
+                <div class="form-group">
+                    <label for="single-text">输入文字</label>
+                    <textarea id="single-text" placeholder="请输入要合成的文字"></textarea>
+                </div>
+                <button onclick="generateSingle()">生成图片</button>
+                <div class="preview" id="single-preview"></div>
+            </div>
+
+            <!-- 批量生成 -->
+            <div id="batch-tab" class="hidden">
+                <div class="form-group">
+                    <label for="batch-template-select">选择模板</label>
+                    <select id="batch-template-select"></select>
+                </div>
+                <div class="form-group">
+                    <label for="batch-text">批量文字（每行一条）</label>
+                    <textarea id="batch-text" placeholder="请输入要合成的文字，每行一条"></textarea>
+                </div>
+                <button onclick="generateBatch()">批量生成</button>
+                <button class="export-btn" onclick="exportImages()">导出图片</button>
+                <div class="preview" id="batch-preview"></div>
+            </div>
+
+            <!-- Excel上传 -->
+            <div id="excel-tab" class="hidden">
+                <div class="form-group">
+                    <label for="excel-template-select">选择模板</label>
+                    <select id="excel-template-select"></select>
+                </div>
+                <div class="form-group">
+                    <label>上传Excel文件</label>
+                    <div class="file-upload" onclick="document.getElementById('excel-file').click()">
+                        <input type="file" id="excel-file" accept=".xlsx,.xls" onchange="handleExcelUpload()">
+                        <p>点击上传Excel文件</p>
+                        <p style="font-size: 12px; color: #999; margin-top: 5px;">Excel文件第一列为文字内容</p>
+                    </div>
+                </div>
+                <button class="export-btn" onclick="exportExcelImages()">导出图片</button>
+                <div class="preview" id="excel-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentImages = [];
+        let token = localStorage.getItem('token');
+
+        // 检查登录状态
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // 显示用户名
+        document.getElementById('username').textContent = localStorage.getItem('username');
+
+        // 创建全局fetch拦截器，处理401错误和token刷新
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            return originalFetch.apply(this, args).then(response => {
+                // 如果返回401未授权，自动跳转到登录页面
+                if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('username');
+                    window.location.href = 'login.html';
+                }
+                
+                // 检查响应头中是否有新的token（token无感知刷新）
+                const newToken = response.headers.get('Authorization');
+                if (newToken && newToken.startsWith('Bearer ')) {
+                    const tokenValue = newToken.substring(7);
+                    // 更新localStorage中的token
+                    localStorage.setItem('token', tokenValue);
+                    // 更新当前请求使用的token
+                    token = tokenValue;
+                    console.log('Token已自动刷新');
+                }
+                
+                return response;
+            });
+        };
+
+        // 加载模板列表
+        async function loadTemplates() {
+            try {
+                const response = await fetch('/api/photo/templates', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const options = result.data.map(t => `<option value="${t.id}">${t.templateName}</option>`).join('');
+                    document.getElementById('template-select').innerHTML = options;
+                    document.getElementById('batch-template-select').innerHTML = options;
+                    document.getElementById('excel-template-select').innerHTML = options;
+                }
+            } catch (error) {
+                showMessage('加载模板失败', 'error');
+            }
+        }
+
+        // 切换标签页
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('[id$="-tab"]').forEach(t => t.classList.add('hidden'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.remove('hidden');
+        }
+
+        // 显示消息
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // 单次生成
+        async function generateSingle() {
+            const text = document.getElementById('single-text').value;
+            const templateId = document.getElementById('template-select').value;
+            
+            if (!text.trim()) {
+                showMessage('请输入文字', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/photo/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ text, templateId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const previewDiv = document.getElementById('single-preview');
+                    previewDiv.innerHTML = `
+                        <div class="preview-item">
+                            <img src="${result.data}" alt="生成的图片">
+                            <div class="text">${text}</div>
+                        </div>
+                    `;
+                    showMessage('生成成功', 'success');
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('生成失败', 'error');
+            }
+        }
+
+        // 批量生成
+        async function generateBatch() {
+            const text = document.getElementById('batch-text').value;
+            const templateId = document.getElementById('batch-template-select').value;
+            
+            if (!text.trim()) {
+                showMessage('请输入文字', 'error');
+                return;
+            }
+
+            const textList = text.split('\n').filter(t => t.trim());
+            
+            try {
+                const response = await fetch('/api/photo/batch-generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ textList, templateId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    currentImages = result.data;
+                    const previewDiv = document.getElementById('batch-preview');
+                    previewDiv.innerHTML = result.data.map((img, index) => `
+                        <div class="preview-item">
+                            <img src="${img}" alt="生成的图片">
+                            <div class="text">${textList[index]}</div>
+                        </div>
+                    `).join('');
+                    showMessage('批量生成成功', 'success');
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('批量生成失败', 'error');
+            }
+        }
+
+        // 导出图片
+        function exportImages() {
+            if (currentImages.length === 0) {
+                showMessage('没有可导出的图片', 'error');
+                return;
+            }
+
+            fetch('/api/photo/export', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ imagePaths: currentImages })
+            }).then(response => response.blob())
+              .then(blob => {
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'photos.zip';
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  showMessage('导出成功', 'success');
+              })
+              .catch(() => showMessage('导出失败', 'error'));
+        }
+
+        // 处理Excel上传
+        async function handleExcelUpload() {
+            const file = document.getElementById('excel-file').files[0];
+            const templateId = document.getElementById('excel-template-select').value;
+            
+            if (!file) {
+                showMessage('请选择文件', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('templateId', templateId);
+
+            try {
+                const response = await fetch('/api/photo/upload-excel', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    currentImages = result.data;
+                    const previewDiv = document.getElementById('excel-preview');
+                    previewDiv.innerHTML = result.data.map(img => `
+                        <div class="preview-item">
+                            <img src="${img}" alt="生成的图片">
+                        </div>
+                    `).join('');
+                    showMessage('Excel处理成功', 'success');
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Excel处理失败', 'error');
+            }
+        }
+
+        // 导出Excel生成的图片
+        function exportExcelImages() {
+            if (currentImages.length === 0) {
+                showMessage('没有可导出的图片', 'error');
+                return;
+            }
+
+            fetch('/api/photo/export', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ imagePaths: currentImages })
+            }).then(response => response.blob())
+              .then(blob => {
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'photos.zip';
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  showMessage('导出成功', 'success');
+              })
+              .catch(() => showMessage('导出失败', 'error'));
+        }
+
+        // 退出登录
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+
+        // 页面加载时初始化
+        loadTemplates();
+    </script>
+</body>
+</html>
