@@ -52,6 +52,19 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
 
     @Override
     public String generatePhoto(String text, Long templateId) {
+        String imagePath = generatePhotoInternal(text, templateId);
+        // 获取模板信息用于记录
+        PhotoTemplate template = getById(templateId);
+        String templateName = template != null ? template.getTemplateName() : "";
+        // 记录使用明细
+        saveUsageRecord(1, 1, templateId, templateName, text, imagePath);
+        return imagePath;
+    }
+
+    /**
+     * 内部方法：生成图片（不保存记录）
+     */
+    private String generatePhotoInternal(String text, Long templateId) {
         try {
             // 获取模板
             PhotoTemplate template = getById(templateId);
@@ -72,6 +85,10 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
+            // 清除原有文字区域（用白色填充）
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(template.getTextX(), template.getTextY(), template.getTextWidth(), template.getTextHeight());
+
             // 设置字体
             Font font = new Font("微软雅黑", Font.PLAIN, template.getFontSize());
             g2d.setFont(font);
@@ -79,15 +96,57 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             // 设置字体颜色
             g2d.setColor(Color.decode(template.getFontColor()));
 
-            // 计算文字位置（居中）
+            // 获取字体度量信息
             FontMetrics fm = g2d.getFontMetrics();
-            int textWidth = fm.stringWidth(text);
-            int textHeight = fm.getHeight();
-            int x = template.getTextX() + (template.getTextWidth() - textWidth) / 2;
-            int y = template.getTextY() + (template.getTextHeight() + textHeight) / 2 - fm.getDescent();
-
-            // 绘制文字
-            g2d.drawString(text, x, y);
+            int lineHeight = fm.getHeight();
+            int ascent = fm.getAscent();
+            
+            // 计算每行最大宽度（留出一些边距）
+            int maxWidth = template.getTextWidth() - 20;
+            
+            // 分割文字为多行
+            List<String> lines = new ArrayList<>();
+            String[] paragraphs = text.split("\n");
+            
+            for (String paragraph : paragraphs) {
+                if (paragraph.isEmpty()) {
+                    lines.add("");
+                    continue;
+                }
+                
+                int start = 0;
+                while (start < paragraph.length()) {
+                    // 找到当前行能容纳的最大字符数
+                    int end = start;
+                    while (end < paragraph.length()) {
+                        String testLine = paragraph.substring(start, end + 1);
+                        if (fm.stringWidth(testLine) > maxWidth) {
+                            break;
+                        }
+                        end++;
+                    }
+                    
+                    if (end == start) {
+                        // 单个字符就超宽，强制换行
+                        lines.add(paragraph.substring(start, start + 1));
+                        start++;
+                    } else {
+                        lines.add(paragraph.substring(start, end));
+                        start = end;
+                    }
+                }
+            }
+            
+            // 计算起始Y坐标（垂直居中）
+            int totalHeight = lines.size() * lineHeight;
+            int startY = template.getTextY() + (template.getTextHeight() - totalHeight) / 2 + ascent;
+            
+            // 绘制每一行文字（左对齐）
+            int x = template.getTextX() + 30; // 左边距30像素
+            for (int i = 0; i < lines.size(); i++) {
+                int y = startY + i * lineHeight;
+                g2d.drawString(lines.get(i), x, y);
+            }
             g2d.dispose();
 
             // 保存生成的图片
@@ -98,9 +157,6 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
                 outputFile.getParentFile().mkdirs();
             }
             ImageIO.write(image, "png", outputFile);
-
-            // 记录使用明细
-            saveUsageRecord(1, 1, templateId, template.getTemplateName(), text);
 
             return "/uploads/" + fileName;
         } catch (IOException e) {
@@ -117,13 +173,14 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
         
         for (String text : textList) {
             if (text != null && !text.trim().isEmpty()) {
-                String imagePath = generatePhoto(text, templateId);
+                // 使用内部方法生成图片，不保存记录
+                String imagePath = generatePhotoInternal(text, templateId);
                 imagePaths.add(imagePath);
             }
         }
 
-        // 记录批量生成使用明细（只记录一次）
-        saveUsageRecord(2, textList.size(), templateId, templateName, textContent);
+        // 记录批量生成使用明细（只记录一次，包含所有图片路径）
+        saveUsageRecord(2, textList.size(), templateId, templateName, textContent, imagePaths);
 
         return imagePaths;
     }
@@ -193,7 +250,7 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
     /**
      * 保存使用记录
      */
-    private void saveUsageRecord(int operationType, int count, Long templateId, String templateName, String textContent) {
+    private void saveUsageRecord(int operationType, int count, Long templateId, String templateName, String textContent, Object imagePaths) {
         UsageRecord record = new UsageRecord();
         record.setUserId(UserContext.getUserId());
         record.setUsername(UserContext.getUsername());
@@ -202,6 +259,23 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
         record.setTemplateId(templateId);
         record.setTemplateName(templateName);
         record.setTextContent(textContent);
+        
+        // 保存图片路径
+        if (imagePaths != null) {
+            if (imagePaths instanceof String) {
+                // 单个图片路径
+                record.setImagePaths((String) imagePaths);
+            } else if (imagePaths instanceof List) {
+                // 多个图片路径，转换为JSON字符串
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    record.setImagePaths(mapper.writeValueAsString(imagePaths));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
         record.setCreateTime(LocalDateTime.now());
         usageRecordMapper.insert(record);
     }

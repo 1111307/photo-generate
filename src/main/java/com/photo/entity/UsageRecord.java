@@ -50,6 +50,11 @@ public class UsageRecord {
     private Integer count;
 
     /**
+     * 图片路径（JSON格式存储多个路径）
+     */
+    private String imagePaths;
+
+    /**
      * 操作时间
      */
     @TableField(fill = FieldFill.INSERT)
