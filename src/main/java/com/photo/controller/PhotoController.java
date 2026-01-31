@@ -1,9 +1,13 @@
 package com.photo.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.photo.common.Result;
 import com.photo.entity.PhotoTemplate;
+import com.photo.entity.UsageRecord;
+import com.photo.mapper.UsageRecordMapper;
 import com.photo.service.PhotoService;
+import com.photo.util.UserContext;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -14,9 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.*;
 
 /**
  * 图片控制器
@@ -27,6 +32,9 @@ public class PhotoController {
 
     @Autowired
     private PhotoService photoService;
+
+    @Autowired
+    private UsageRecordMapper usageRecordMapper;
 
     /**
      * 获取启用的模板列表
@@ -128,6 +136,72 @@ public class PhotoController {
             return Result.success("批量生成成功", imagePaths);
         } catch (Exception e) {
             return Result.error("处理Excel失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取用户统计信息
+     */
+    @GetMapping("/user-stats")
+    public Result<Map<String, Object>> getUserStats() {
+        try {
+            Long userId = UserContext.getUserId();
+            Map<String, Object> stats = new HashMap<>();
+
+            // 今日生成数
+            LambdaQueryWrapper<UsageRecord> todayWrapper = new LambdaQueryWrapper<>();
+            todayWrapper.eq(UsageRecord::getUserId, userId)
+                    .apply("DATE(create_time) = CURDATE()");
+            List<UsageRecord> todayRecords = usageRecordMapper.selectList(todayWrapper);
+            int todayCount = todayRecords.stream().mapToInt(UsageRecord::getCount).sum();
+            stats.put("todayCount", todayCount);
+
+            // 本月生成数
+            LambdaQueryWrapper<UsageRecord> monthWrapper = new LambdaQueryWrapper<>();
+            monthWrapper.eq(UsageRecord::getUserId, userId)
+                    .apply("YEAR(create_time) = YEAR(NOW()) AND MONTH(create_time) = MONTH(NOW())");
+            List<UsageRecord> monthRecords = usageRecordMapper.selectList(monthWrapper);
+            int monthCount = monthRecords.stream().mapToInt(UsageRecord::getCount).sum();
+            stats.put("monthCount", monthCount);
+
+            // 总生成数
+            LambdaQueryWrapper<UsageRecord> totalWrapper = new LambdaQueryWrapper<>();
+            totalWrapper.eq(UsageRecord::getUserId, userId);
+            List<UsageRecord> totalRecords = usageRecordMapper.selectList(totalWrapper);
+            int totalCount = totalRecords.stream().mapToInt(UsageRecord::getCount).sum();
+            stats.put("totalCount", totalCount);
+
+            return Result.success(stats);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 获取用户使用记录
+     */
+    @GetMapping("/user-records")
+    public Result<Map<String, Object>> getUserRecords(@RequestParam(defaultValue = "1") Integer page,
+                                                      @RequestParam(defaultValue = "10") Integer size) {
+        try {
+            Long userId = UserContext.getUserId();
+
+            Page<UsageRecord> recordPage = new Page<>(page, size);
+            LambdaQueryWrapper<UsageRecord> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(UsageRecord::getUserId, userId)
+                    .orderByDesc(UsageRecord::getId);
+
+            Page<UsageRecord> result = usageRecordMapper.selectPage(recordPage, wrapper);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("records", result.getRecords());
+            response.put("total", result.getTotal());
+            response.put("pages", result.getPages());
+            response.put("current", result.getCurrent());
+
+            return Result.success(response);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
     }
 }

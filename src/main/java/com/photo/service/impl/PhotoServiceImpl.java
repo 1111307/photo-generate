@@ -19,12 +19,14 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -98,7 +100,7 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             ImageIO.write(image, "png", outputFile);
 
             // 记录使用明细
-            saveUsageRecord(1);
+            saveUsageRecord(1, 1, templateId, template.getTemplateName(), text);
 
             return "/uploads/" + fileName;
         } catch (IOException e) {
@@ -109,6 +111,10 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
     @Override
     public List<String> batchGeneratePhotos(List<String> textList, Long templateId) {
         List<String> imagePaths = new ArrayList<>();
+        PhotoTemplate template = getById(templateId);
+        String templateName = template != null ? template.getTemplateName() : "";
+        String textContent = String.join(", ", textList);
+        
         for (String text : textList) {
             if (text != null && !text.trim().isEmpty()) {
                 String imagePath = generatePhoto(text, templateId);
@@ -116,8 +122,8 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             }
         }
 
-        // 记录批量生成使用明细
-        saveUsageRecord(2, textList.size());
+        // 记录批量生成使用明细（只记录一次）
+        saveUsageRecord(2, textList.size(), templateId, templateName, textContent);
 
         return imagePaths;
     }
@@ -187,19 +193,16 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
     /**
      * 保存使用记录
      */
-    private void saveUsageRecord(int operationType) {
-        saveUsageRecord(operationType, 1);
-    }
-
-    /**
-     * 保存使用记录
-     */
-    private void saveUsageRecord(int operationType, int count) {
+    private void saveUsageRecord(int operationType, int count, Long templateId, String templateName, String textContent) {
         UsageRecord record = new UsageRecord();
         record.setUserId(UserContext.getUserId());
         record.setUsername(UserContext.getUsername());
         record.setOperationType(operationType);
         record.setCount(count);
+        record.setTemplateId(templateId);
+        record.setTemplateName(templateName);
+        record.setTextContent(textContent);
+        record.setCreateTime(LocalDateTime.now());
         usageRecordMapper.insert(record);
     }
 }

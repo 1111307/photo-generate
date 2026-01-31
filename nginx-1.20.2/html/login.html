@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 - 图片文字合成系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,8 +13,8 @@
         }
 
         body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Roboto', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1f73e7 0%, #1765cc 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,18 +23,27 @@
 
         .container {
             background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 48px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 30px;
+            color: #202124;
+            margin-bottom: 8px;
             font-size: 28px;
+            font-weight: 500;
+            letter-spacing: 0.25px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #5f6368;
+            margin-bottom: 32px;
+            font-size: 14px;
         }
 
         .form-group {
@@ -43,89 +53,109 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #555;
+            color: #202124;
             font-weight: 500;
+            font-size: 14px;
         }
 
         input[type="text"],
         input[type="password"] {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            font-family: 'Roboto', Arial, sans-serif;
+            transition: all 0.2s ease;
         }
 
         input[type="text"]:focus,
         input[type="password"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #1f73e7;
+            box-shadow: 0 1px 3px 0 rgba(31,115,231,.3);
         }
 
         button {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1f73e7;
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
         }
 
         button:hover {
-            transform: translateY(-2px);
+            background: #1765cc;
+            box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
         }
 
         button:active {
-            transform: translateY(0);
+            background: #1557b0;
         }
 
         .links {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 24px;
         }
 
         .links a {
-            color: #667eea;
+            color: #1f73e7;
             text-decoration: none;
             font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
 
         .links a:hover {
+            color: #1765cc;
             text-decoration: underline;
         }
 
         .error {
-            color: #e74c3c;
-            font-size: 14px;
-            margin-top: 10px;
+            color: #c5221f;
+            font-size: 13px;
+            margin-top: 12px;
             text-align: center;
             display: none;
+            background: #fce8e6;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #c5221f;
         }
 
         .success {
-            color: #27ae60;
-            font-size: 14px;
-            margin-top: 10px;
+            color: #137333;
+            font-size: 13px;
+            margin-top: 12px;
             text-align: center;
             display: none;
+            background: #e6f4ea;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #137333;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>登录</h1>
+        <p class="subtitle">图片文字合成系统</p>
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">用户名</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required>
             </div>
             <div class="form-group">
                 <label for="password">密码</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" placeholder="请输入密码" required>
             </div>
             <button type="submit">登录</button>
             <div class="error" id="error"></div>
@@ -137,25 +167,8 @@
     </div>
 
     <script>
-        // 页面加载时清除所有本地存储的认证信息
         localStorage.removeItem('token');
         localStorage.removeItem('username');
-        
-        // 创建全局fetch拦截器，处理token刷新
-        const originalFetch = window.fetch;
-        window.fetch = function(...args) {
-            return originalFetch.apply(this, args).then(response => {
-                // 检查响应头中是否有新的token（token无感知刷新）
-                const newToken = response.headers.get('Authorization');
-                if (newToken && newToken.startsWith('Bearer ')) {
-                    const tokenValue = newToken.substring(7);
-                    // 更新localStorage中的token
-                    localStorage.setItem('token', tokenValue);
-                    console.log('Token已自动刷新');
-                }
-                return response;
-            });
-        };
         
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();

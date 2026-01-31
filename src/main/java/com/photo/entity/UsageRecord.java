@@ -30,6 +30,21 @@ public class UsageRecord {
     private Integer operationType;
 
     /**
+     * 模板ID
+     */
+    private Long templateId;
+
+    /**
+     * 模板名称
+     */
+    private String templateName;
+
+    /**
+     * 文字内容
+     */
+    private String textContent;
+
+    /**
      * 生成数量
      */
     private Integer count;

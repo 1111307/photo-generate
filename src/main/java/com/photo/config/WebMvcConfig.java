@@ -1,8 +1,12 @@
 package com.photo.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.photo.interceptor.AuthInterceptor;
 import com.photo.interceptor.TokenRefreshInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -56,5 +60,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 模板文件访问路径
         registry.addResourceHandler("/templates/**")
                 .addResourceLocations("file:./templates/");
+    }
+
+    /**
+     * MyBatisPlus 分页插件配置
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 添加分页插件，指定数据库类型为 MySQL
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
     }
 }
