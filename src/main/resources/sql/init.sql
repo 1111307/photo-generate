@@ -50,6 +50,16 @@ CREATE TABLE IF NOT EXISTS `usage_record` (
   KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用记录表';
 
+-- 添加usage_record表的新字段
+ALTER TABLE `usage_record` ADD COLUMN `template_id` bigint DEFAULT NULL COMMENT '模板ID' AFTER `username`;
+ALTER TABLE `usage_record` ADD COLUMN `text_content` varchar(500) DEFAULT NULL COMMENT '文字内容' AFTER `template_id`;
+ALTER TABLE `usage_record` ADD COLUMN `template_name` varchar(255) DEFAULT NULL COMMENT '模板名称' AFTER `template_id`;
+ALTER TABLE `usage_record` ADD COLUMN `image_paths` TEXT COMMENT '图片路径（JSON格式存储多个路径）' AFTER `count`;
+
+-- 添加索引
+ALTER TABLE `usage_record` ADD KEY `idx_template_id` (`template_id`);
+ALTER TABLE `usage_record` ADD KEY `idx_template_name` (`template_name`);
+
 -- 插入默认管理员账号（密码：admin123，使用BCrypt加密）
 INSERT INTO `user` (`username`, `password`, `email`, `role`) VALUES 
 ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', 'admin@example.com', 1)
