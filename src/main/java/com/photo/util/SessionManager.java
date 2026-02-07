@@ -11,16 +11,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionManager {
     
     // 用户ID -> Session的映射
-    private static final Map<Long, HttpSession> USER_SESSION_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, HttpSession> USER_SESSION_MAP = new ConcurrentHashMap<>();
     
     // Session -> 用户ID的映射
-    private static final Map<String, Long> SESSION_USER_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, String> SESSION_USER_MAP = new ConcurrentHashMap<>();
     
     /**
      * 添加用户Session映射
      * 如果该用户已有Session，先让旧Session失效
      */
-    public static void addUserSession(Long userId, HttpSession session) {
+    public static void addUserSession(String userId, HttpSession session) {
         // 检查该用户是否已有Session
         HttpSession oldSession = USER_SESSION_MAP.get(userId);
         if (oldSession != null && oldSession.getId().equals(session.getId())) {
@@ -48,7 +48,7 @@ public class SessionManager {
      * 移除用户Session映射
      */
     public static void removeUserSession(HttpSession session) {
-        Long userId = SESSION_USER_MAP.remove(session.getId());
+        String userId = SESSION_USER_MAP.remove(session.getId());
         if (userId != null) {
             USER_SESSION_MAP.remove(userId);
         }
@@ -57,14 +57,14 @@ public class SessionManager {
     /**
      * 根据用户ID获取Session
      */
-    public static HttpSession getSessionByUserId(Long userId) {
+    public static HttpSession getSessionByUserId(String userId) {
         return USER_SESSION_MAP.get(userId);
     }
     
     /**
      * 根据Session ID获取用户ID
      */
-    public static Long getUserIdBySessionId(String sessionId) {
+    public static String getUserIdBySessionId(String sessionId) {
         return SESSION_USER_MAP.get(sessionId);
     }
     
@@ -76,7 +76,7 @@ public class SessionManager {
             return false;
         }
         
-        Long userId = SESSION_USER_MAP.get(session.getId());
+        String userId = SESSION_USER_MAP.get(session.getId());
         if (userId == null) {
             return false;
         }

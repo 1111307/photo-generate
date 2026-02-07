@@ -15,6 +15,11 @@ public class PhotoTemplate {
     private Long id;
 
     /**
+     * 所属用户ID（多对一关系）
+     */
+    private String userId;
+
+    /**
      * 模板名称
      */
     private String templateName;

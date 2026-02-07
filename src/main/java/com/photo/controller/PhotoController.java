@@ -50,6 +50,36 @@ public class PhotoController {
     }
 
     /**
+     * 创建模板
+     */
+    @PostMapping("/create-template")
+    public Result<PhotoTemplate> createTemplate(@RequestParam("file") MultipartFile file,
+                                                @RequestParam("templateName") String templateName,
+                                                @RequestParam(value = "textX", defaultValue = "0") Integer textX,
+                                                @RequestParam(value = "textY", defaultValue = "0") Integer textY,
+                                                @RequestParam(value = "textWidth", defaultValue = "0") Integer textWidth,
+                                                @RequestParam(value = "textHeight", defaultValue = "0") Integer textHeight,
+                                                @RequestParam(value = "fontSize", defaultValue = "24") Integer fontSize,
+                                                @RequestParam(value = "fontColor", defaultValue = "#000000") String fontColor) {
+        try {
+            PhotoTemplate template = new PhotoTemplate();
+            template.setTemplateName(templateName);
+            template.setTextX(textX);
+            template.setTextY(textY);
+            template.setTextWidth(textWidth);
+            template.setTextHeight(textHeight);
+            template.setFontSize(fontSize);
+            template.setFontColor(fontColor);
+            template.setStatus(1); // 默认启用
+
+            PhotoTemplate createdTemplate = photoService.createTemplate(template, file);
+            return Result.success("创建模板成功", createdTemplate);
+        } catch (Exception e) {
+            return Result.error("创建模板失败：" + e.getMessage());
+        }
+    }
+
+    /**
      * 单次生成图片
      */
     @PostMapping("/generate")
@@ -145,7 +175,7 @@ public class PhotoController {
     @GetMapping("/user-stats")
     public Result<Map<String, Object>> getUserStats() {
         try {
-            Long userId = UserContext.getUserId();
+            String userId = UserContext.getUserId();
             Map<String, Object> stats = new HashMap<>();
 
             // 今日生成数
@@ -184,7 +214,7 @@ public class PhotoController {
     public Result<Map<String, Object>> getUserRecords(@RequestParam(defaultValue = "1") Integer page,
                                                       @RequestParam(defaultValue = "10") Integer size) {
         try {
-            Long userId = UserContext.getUserId();
+            String userId = UserContext.getUserId();
 
             Page<UsageRecord> recordPage = new Page<>(page, size);
             LambdaQueryWrapper<UsageRecord> wrapper = new LambdaQueryWrapper<>();

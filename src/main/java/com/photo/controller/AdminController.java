@@ -64,7 +64,7 @@ public class AdminController {
     @GetMapping("/usage-records")
     public Result<Page<UsageRecord>> getUsageRecords(@RequestParam(defaultValue = "1") Integer page,
                                                      @RequestParam(defaultValue = "10") Integer size,
-                                                     @RequestParam(required = false) Long userId) {
+                                                     @RequestParam(required = false) String userId) {
         try {
             // 检查是否是管理员
             User currentUser = UserContext.getUser();

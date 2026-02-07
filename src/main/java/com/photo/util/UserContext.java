@@ -27,7 +27,7 @@ public class UserContext {
     /**
      * 获取当前用户ID
      */
-    public static Long getUserId() {
+    public static String getUserId() {
         User user = getUser();
         return user != null ? user.getId() : null;
     }

@@ -3,6 +3,7 @@ package com.photo.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 用户实体类
@@ -11,8 +12,8 @@ import java.time.LocalDateTime;
 @TableName("user")
 public class User {
 
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @TableId(type = IdType.ASSIGN_UUID)
+    private String id;
 
     /**
      * 用户名

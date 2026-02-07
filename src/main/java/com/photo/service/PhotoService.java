@@ -38,6 +38,11 @@ public interface PhotoService extends IService<PhotoTemplate> {
     boolean saveTemplate(PhotoTemplate template);
 
     /**
+     * 创建模板（包含图片上传和配置保存）
+     */
+    PhotoTemplate createTemplate(PhotoTemplate template, MultipartFile file);
+
+    /**
      * 获取启用的模板列表
      */
     List<PhotoTemplate> getActiveTemplates();

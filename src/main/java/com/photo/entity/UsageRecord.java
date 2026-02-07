@@ -17,7 +17,7 @@ public class UsageRecord {
     /**
      * 用户ID
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 用户名

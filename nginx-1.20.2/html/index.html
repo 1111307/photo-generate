@@ -598,6 +598,224 @@
             transition: var(--transition);
         }
 
+        .logout-modal {
+            display: none;
+            position: fixed;
+            z-index: 9998;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .logout-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logout-modal-content {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logout-modal-icon {
+            font-size: 48px;
+            color: var(--success);
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .logout-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 10px;
+        }
+
+        .logout-modal-message {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease 0.3s both;
+        }
+
+        .logout-modal-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(76, 201, 240, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--success);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .account-modal {
+            display: none;
+            position: fixed;
+            z-index: 9997;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .account-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 60px;
+        }
+
+        .account-modal-content {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .account-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .account-modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .account-modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .account-modal-close:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .account-modal-logout-btn {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .login-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .login-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-modal-content {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .login-modal-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        .login-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 10px;
+        }
+
+        .login-modal-message {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease 0.3s both;
+        }
+
+        .login-modal-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(67, 97, 238, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 padding: 0 15px;
@@ -646,8 +864,11 @@
                     <button class="btn btn-outline" onclick="goToAccount()" id="username-btn">
                         <i class="fas fa-user"></i>我的账户
                     </button>
-                    <button class="btn btn-outline" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>退出
+                    <button class="btn btn-primary" onclick="window.location.href='login.html'" id="login-btn" style="display: none;">
+                        <i class="fas fa-sign-in-alt"></i>登录
+                    </button>
+                    <button class="btn btn-outline" onclick="window.location.href='register.html'" id="register-btn" style="display: none;">
+                        <i class="fas fa-user-plus"></i>注册
                     </button>
                 </div>
             </div>
@@ -662,12 +883,6 @@
                     <button class="tab" onclick="switchTab('batch')">
                         <i class="fas fa-layer-group"></i>批量生成
                     </button>
-                    <button class="tab" onclick="switchTab('excel')">
-                        <i class="fas fa-file-excel"></i>Excel上传
-                    </button>
-                    <button class="tab" onclick="switchTab('account')">
-                        <i class="fas fa-chart-bar"></i>我的账户
-                    </button>
                 </div>
 
                 <div class="tab-content">
@@ -680,6 +895,14 @@
                                 <i class="fas fa-palette"></i>选择模板
                             </label>
                             <select class="form-control" id="template-select"></select>
+                        </div>
+                        <div class="form-group" id="single-template-preview" style="display: none;">
+                            <label class="form-label">
+                                <i class="fas fa-eye"></i>模板预览
+                            </label>
+                            <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px;">
+                                <img id="single-template-image" src="" alt="模板预览" style="max-width: 100%; max-height: 300px; border-radius: var(--border-radius-sm);">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="single-text">
@@ -712,15 +935,36 @@
                             </label>
                             <select class="form-control" id="batch-template-select"></select>
                         </div>
+                        <div class="form-group" id="batch-template-preview" style="display: none;">
+                            <label class="form-label">
+                                <i class="fas fa-eye"></i>模板预览
+                            </label>
+                            <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px;">
+                                <img id="batch-template-image" src="" alt="模板预览" style="max-width: 100%; max-height: 300px; border-radius: var(--border-radius-sm);">
+                            </div>
+                        </div>
+                        
                         <div class="form-group">
-                            <label class="form-label" for="batch-text">
+                            <label class="form-label">
                                 <i class="fas fa-font"></i>批量文字（每行一条）
                             </label>
                             <textarea class="form-control" id="batch-text" placeholder="请输入要合成的文字，每行一条..."></textarea>
+                            <button class="btn btn-primary" onclick="generateBatch()" style="margin-top: 15px;">
+                                <i class="fas fa-magic"></i>批量生成
+                            </button>
                         </div>
-                        <button class="btn btn-primary" onclick="generateBatch()">
-                            <i class="fas fa-magic"></i>批量生成
-                        </button>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-file-excel"></i>或上传Excel文件
+                            </label>
+                            <div class="file-upload" id="excel-upload-area">
+                                <input type="file" id="excel-file" accept=".xlsx,.xls" onchange="handleExcelUpload()">
+                                <i class="fas fa-file-upload"></i>
+                                <p>点击上传Excel文件</p>
+                                <p class="hint">Excel文件第一列为文字内容</p>
+                            </div>
+                        </div>
                         
                         <div class="preview-section" id="batch-preview-section" style="display: none;">
                             <div class="preview-title">
@@ -734,91 +978,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Excel上传 -->
-                    <div id="excel-tab" class="hidden">
-                        <div class="form-group">
-                            <label class="form-label" for="excel-template-select">
-                                <i class="fas fa-palette"></i>选择模板
-                            </label>
-                            <select class="form-control" id="excel-template-select"></select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-file-excel"></i>上传Excel文件
-                            </label>
-                            <div class="file-upload">
-                                <input type="file" id="excel-file" accept=".xlsx,.xls" onchange="handleExcelUpload()">
-                                <i class="fas fa-file-upload"></i>
-                                <p>点击上传Excel文件</p>
-                                <p class="hint">Excel文件第一列为文字内容</p>
-                            </div>
-                        </div>
-                        
-                        <div class="preview-section" id="excel-preview-section" style="display: none;">
-                            <div class="preview-title">
-                                <i class="fas fa-eye"></i>预览结果
-                            </div>
-                            <div class="preview-grid" id="excel-preview"></div>
-                            <div class="action-buttons">
-                                <button class="btn btn-success" onclick="exportExcelImages()" id="excel-export-btn">
-                                    <i class="fas fa-download"></i>导出图片
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 我的账户 -->
-                    <div id="account-tab" class="hidden">
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <i class="fas fa-calendar-day stat-icon"></i>
-                                <div class="stat-label">今日生成</div>
-                                <div class="stat-value" id="today-count">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <i class="fas fa-calendar-alt stat-icon"></i>
-                                <div class="stat-label">本月生成</div>
-                                <div class="stat-value" id="month-count">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <i class="fas fa-chart-line stat-icon"></i>
-                                <div class="stat-label">总计生成</div>
-                                <div class="stat-value" id="total-count">0</div>
-                            </div>
-                        </div>
-
-                        <div class="preview-title">
-                            <i class="fas fa-list"></i>使用明细
-                        </div>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>生成时间</th>
-                                        <th>模板</th>
-                                        <th>数量</th>
-                                        <th>文字内容</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usage-records">
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 20px;">加载中...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pagination">
-                            <button class="btn btn-outline" onclick="previousPage()">
-                                <i class="fas fa-chevron-left"></i>上一页
-                            </button>
-                            <span class="page-info" id="page-info">第 1 页</span>
-                            <button class="btn btn-outline" onclick="nextPage()">
-                                下一页<i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </main>
@@ -830,48 +989,246 @@
         <img class="modal-content" id="modalImage">
         <div id="modalCaption" class="modal-caption"></div>
     </div>
+    <!-- 登出模态框 -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <div class="logout-modal-title">正在登出...</div>
+            <div class="logout-modal-message">请稍候，正在安全退出您的账户</div>
+            <div class="logout-modal-spinner"></div>
+        </div>
+    </div>
+
+    <!-- 账户模态框 -->
+    <div id="accountModal" class="account-modal">
+        <div class="account-modal-content">
+            <div class="account-modal-header">
+                <div class="account-modal-title">我的账户</div>
+                <button class="account-modal-close" onclick="closeAccountModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="account-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-day stat-icon"></i>
+                        <div class="stat-label">今日生成</div>
+                        <div class="stat-value" id="modal-today-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-alt stat-icon"></i>
+                        <div class="stat-label">本月生成</div>
+                        <div class="stat-value" id="modal-month-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line stat-icon"></i>
+                        <div class="stat-label">总计生成</div>
+                        <div class="stat-value" id="modal-total-count">0</div>
+                    </div>
+                </div>
+
+                <div class="preview-title">
+                    <i class="fas fa-list"></i>使用明细
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>生成时间</th>
+                                <th>模板</th>
+                                <th>数量</th>
+                                <th>文字内容</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-usage-records">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 20px;">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button class="btn btn-outline" onclick="previousModalPage()">
+                        <i class="fas fa-chevron-left"></i>上一页
+                    </button>
+                    <span class="page-info" id="modal-page-info">第 1 页</span>
+                    <button class="btn btn-outline" onclick="nextModalPage()">
+                        下一页<i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="account-modal-logout-btn">
+                <button class="btn btn-primary" onclick="logout()" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i>退出登录
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-modal-content">
+            <div class="login-modal-icon">
+                <i class="fas fa-sign-in-alt"></i>
+            </div>
+            <div class="login-modal-title">正在登录...</div>
+            <div class="login-modal-message">请稍候，正在验证您的身份</div>
+            <div class="login-modal-spinner"></div>
+        </div>
+    </div>
+
 
     <script>
         let currentImages = [];
         let token = localStorage.getItem('token');
         let currentPage = 1;
         let totalPages = 1;
+        let modalCurrentPage = 1;
+        let modalTotalPages = 1;
+        let isLoggedIn = !!token;
+        let templates = []; // 保存模板数据
 
-        if (!token) {
-            window.location.href = 'login.html';
+        // 初始化页面
+        function initPage() {
+            const username = localStorage.getItem('username');
+             
+            if (isLoggedIn) {
+                // 已登录状态
+                document.getElementById('user-avatar').textContent = username ? username.charAt(0).toUpperCase() : 'U';
+                document.getElementById('username-btn').innerHTML = `<i class="fas fa-user"></i>${username || '用户'}`;
+                document.getElementById('username-btn').style.display = 'inline-flex';
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('register-btn').style.display = 'none';
+                // 允许input接收点击事件
+                document.getElementById('excel-file').style.pointerEvents = 'auto';
+            } else {
+                // 未登录状态
+                document.getElementById('user-avatar').style.display = 'none';
+                document.getElementById('username-btn').innerHTML = `<i class="fas fa-user"></i>未登录`;
+                document.getElementById('username-btn').style.display = 'inline-flex';
+                document.getElementById('login-btn').style.display = 'inline-flex';
+                document.getElementById('register-btn').style.display = 'inline-flex';
+                // 阻止input接收点击事件
+                document.getElementById('excel-file').style.pointerEvents = 'none';
+            }
         }
 
-        const username = localStorage.getItem('username');
-        document.getElementById('user-avatar').textContent = username ? username.charAt(0).toUpperCase() : 'U';
-        document.getElementById('username-btn').innerHTML = `<i class="fas fa-user"></i>${username || '用户'} - 我的账户`;
+        initPage();
 
         const originalFetch = window.fetch;
         window.fetch = function(...args) {
             return originalFetch.apply(this, args).then(response => {
-                if (response.status === 401) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('username');
-                    window.location.href = 'login.html';
+                // 对于公开接口（如获取模板列表），401不触发重定向
+                const url = args[0];
+                if (response.status === 401 && !url.includes('/api/photo/templates')) {
+                    handle401Error();
                 }
                 return response;
             });
         };
 
+        function handle401Error() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            isLoggedIn = false;
+            token = null;
+            
+            // 关闭账户模态框
+            const accountModal = document.getElementById('accountModal');
+            if (accountModal) {
+                accountModal.classList.remove('show');
+            }
+            
+            // 清空模板下拉框
+            document.getElementById('template-select').innerHTML = '<option value="">请选择模板</option>';
+            document.getElementById('batch-template-select').innerHTML = '<option value="">请选择模板</option>';
+            templates = [];
+            
+            // 隐藏模板预览
+            document.getElementById('single-template-preview').style.display = 'none';
+            document.getElementById('batch-template-preview').style.display = 'none';
+            
+            // 更新UI为未登录状态
+            initPage();
+            
+            // 显示提示信息
+            showMessage('登录已过期，请重新登录', 'error');
+        }
+
         async function loadTemplates() {
             try {
-                const response = await fetch('/api/photo/templates', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                const headers = {};
+                if (token) {
+                    headers['Authorization'] = 'Bearer ' + token;
+                }
+                const response = await fetch('/api/photo/templates', { headers });
                 const result = await response.json();
                 
                 if (result.code === 200) {
-                    const options = result.data.map(t => `<option value="${t.id}">${t.templateName}</option>`).join('');
-                    document.getElementById('template-select').innerHTML = options;
-                    document.getElementById('batch-template-select').innerHTML = options;
-                    document.getElementById('excel-template-select').innerHTML = options;
+                    templates = result.data; // 保存模板数据
+                    
+                    // 添加默认选项
+                    const defaultOption = '<option value="">请选择模板</option>';
+                    const options = templates.map(t => `<option value="${t.id}">${t.templateName}</option>`).join('');
+                    document.getElementById('template-select').innerHTML = defaultOption + options;
+                    document.getElementById('batch-template-select').innerHTML = defaultOption + options;
+                    
+                    // 模板加载完成后，绑定事件监听器
+                    bindTemplateChangeEvents();
                 }
             } catch (error) {
                 showMessage('加载模板失败', 'error');
+            }
+        }
+        
+        // 绑定模板选择变化事件
+        function bindTemplateChangeEvents() {
+            // 单次生成模板选择变化事件
+            document.getElementById('template-select').addEventListener('change', function() {
+                const templateId = this.value;
+                showTemplatePreview(templateId, 'single-template-preview', 'single-template-image');
+            });
+            
+            // 批量生成模板选择变化事件
+            document.getElementById('batch-template-select').addEventListener('change', function() {
+                const templateId = this.value;
+                showTemplatePreview(templateId, 'batch-template-preview', 'batch-template-image');
+            });
+        }
+
+        // 显示模板预览
+        function showTemplatePreview(templateId, previewDivId, imageId) {
+            // 检查是否已登录
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                // 重置下拉框
+                const selectElement = previewDivId === 'single-template-preview'
+                    ? document.getElementById('template-select')
+                    : document.getElementById('batch-template-select');
+                selectElement.value = '';
+                return;
+            }
+            
+            const template = templates.find(t => t.id == templateId);
+            const previewDiv = document.getElementById(previewDivId);
+            const image = document.getElementById(imageId);
+            
+            if (template && template.imagePath) {
+                // 直接使用相对路径
+                image.src = template.imagePath;
+                // 添加点击事件，使图片可以被打开查看
+                image.style.cursor = 'pointer';
+                image.onclick = function() {
+                    openModal(template.imagePath, template.templateName);
+                };
+                previewDiv.style.display = 'block';
+            } else {
+                previewDiv.style.display = 'none';
             }
         }
 
@@ -900,6 +1257,11 @@
         }
 
         async function generateSingle() {
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+
             const text = document.getElementById('single-text').value;
             const templateId = document.getElementById('template-select').value;
             
@@ -950,6 +1312,11 @@
         }
 
         function exportSingleImage() {
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+            
             if (currentImages.length === 0) {
                 showMessage('没有可导出的图片', 'error');
                 return;
@@ -976,6 +1343,11 @@
         }
 
         async function generateBatch() {
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+
             const text = document.getElementById('batch-text').value;
             const templateId = document.getElementById('batch-template-select').value;
             
@@ -1027,6 +1399,11 @@
         }
 
         function exportImages() {
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+            
             if (currentImages.length === 0) {
                 showMessage('没有可导出的图片', 'error');
                 return;
@@ -1053,9 +1430,14 @@
         }
 
         async function handleExcelUpload() {
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+
             const fileInput = document.getElementById('excel-file');
             const file = fileInput.files[0];
-            const templateId = document.getElementById('excel-template-select').value;
+            const templateId = document.getElementById('batch-template-select').value;
             
             if (!file) {
                 showMessage('请选择文件', 'error');
@@ -1092,8 +1474,8 @@
                 
                 if (result.code === 200) {
                     currentImages = result.data;
-                    const previewSection = document.getElementById('excel-preview-section');
-                    const previewDiv = document.getElementById('excel-preview');
+                    const previewSection = document.getElementById('batch-preview-section');
+                    const previewDiv = document.getElementById('batch-preview');
                     
                     previewDiv.innerHTML = result.data.map(img => `
                         <div class="preview-card" onclick="openModal('${img}', '')">
@@ -1116,6 +1498,11 @@
         }
 
         function exportExcelImages() {
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+            
             if (currentImages.length === 0) {
                 showMessage('没有可导出的图片', 'error');
                 return;
@@ -1142,6 +1529,13 @@
         }
 
         async function logout() {
+            // 显示登出模态框
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.classList.add('show');
+            
+            // 禁用所有按钮
+            disableAllButtons(true);
+            
             try {
                 await fetch('/api/auth/logout', {
                     method: 'POST',
@@ -1151,9 +1545,47 @@
                 console.error('Logout error:', error);
             }
             
-            localStorage.removeItem('token');
-            localStorage.removeItem('username');
-            window.location.href = 'login.html';
+            // 延迟一下以显示动画效果
+            setTimeout(() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                isLoggedIn = false;
+                token = null;
+                
+                // 隐藏模态框
+                logoutModal.classList.remove('show');
+                
+                // 关闭账户模态框
+                const accountModal = document.getElementById('accountModal');
+                if (accountModal) {
+                    accountModal.classList.remove('show');
+                }
+                
+                // 清空模板下拉框
+                document.getElementById('template-select').innerHTML = '<option value="">请选择模板</option>';
+                document.getElementById('batch-template-select').innerHTML = '<option value="">请选择模板</option>';
+                templates = [];
+                
+                // 隐藏模板预览
+                document.getElementById('single-template-preview').style.display = 'none';
+                document.getElementById('batch-template-preview').style.display = 'none';
+                
+                // 重新启用按钮
+                disableAllButtons(false);
+                
+                // 更新UI
+                initPage();
+                
+                // 显示成功消息
+                showMessage('已成功退出登录', 'success');
+            }, 1500);
+        }
+
+        function disableAllButtons(disabled) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = disabled;
+            });
         }
 
         async function loadUserStats() {
@@ -1165,9 +1597,9 @@
                 
                 if (result.code === 200) {
                     const stats = result.data;
-                    document.getElementById('today-count').textContent = stats.todayCount || 0;
-                    document.getElementById('month-count').textContent = stats.monthCount || 0;
-                    document.getElementById('total-count').textContent = stats.totalCount || 0;
+                    document.getElementById('modal-today-count').textContent = stats.todayCount || 0;
+                    document.getElementById('modal-month-count').textContent = stats.monthCount || 0;
+                    document.getElementById('modal-total-count').textContent = stats.totalCount || 0;
                 }
             } catch (error) {
                 console.error('加载统计信息失败:', error);
@@ -1183,10 +1615,10 @@
                 
                 if (result.code === 200) {
                     const records = result.data.records || [];
-                    currentPage = result.data.current || page;
-                    totalPages = result.data.pages || 1;
+                    modalCurrentPage = result.data.current || page;
+                    modalTotalPages = result.data.pages || 1;
                     
-                    const tbody = document.getElementById('usage-records');
+                    const tbody = document.getElementById('modal-usage-records');
                     
                     if (records.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">暂无使用记录</td></tr>';
@@ -1233,23 +1665,23 @@
                         }).join('');
                     }
                     
-                    document.getElementById('page-info').textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页`;
+                    document.getElementById('modal-page-info').textContent = `第 ${modalCurrentPage} 页 / 共 ${modalTotalPages} 页`;
                 }
             } catch (error) {
                 console.error('加载使用明细失败:', error);
-                document.getElementById('usage-records').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">加载失败</td></tr>';
+                document.getElementById('modal-usage-records').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载失败</td></tr>';
             }
         }
 
-        function previousPage() {
-            if (currentPage > 1) {
-                loadUsageRecords(currentPage - 1);
+        function previousModalPage() {
+            if (modalCurrentPage > 1) {
+                loadUsageRecords(modalCurrentPage - 1);
             }
         }
 
-        function nextPage() {
-            if (currentPage < totalPages) {
-                loadUsageRecords(currentPage + 1);
+        function nextModalPage() {
+            if (modalCurrentPage < modalTotalPages) {
+                loadUsageRecords(modalCurrentPage + 1);
             }
         }
 
@@ -1266,11 +1698,31 @@
         }
 
         function goToAccount() {
-            const accountTab = document.querySelector('.tab:nth-child(4)');
-            if (accountTab) {
-                accountTab.click();
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+                return;
             }
+            
+            // 显示账户模态框
+            const accountModal = document.getElementById('accountModal');
+            accountModal.classList.add('show');
+            
+            // 加载数据
+            loadUserStats();
+            loadUsageRecords(1);
         }
+
+        function closeAccountModal() {
+            const accountModal = document.getElementById('accountModal');
+            accountModal.classList.remove('show');
+        }
+
+        // 点击模态框背景关闭
+        document.getElementById('accountModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAccountModal();
+            }
+        });
 
         // 图片查看模态框功能
         function openModal(imageSrc, caption) {
@@ -1305,6 +1757,13 @@
         });
 
         loadTemplates();
+
+        // Excel上传区域点击事件
+        document.getElementById('excel-upload-area').addEventListener('click', function(e) {
+            if (!isLoggedIn) {
+                showMessage('请先登录', 'error');
+            }
+        });
     </script>
 </body>
 </html>

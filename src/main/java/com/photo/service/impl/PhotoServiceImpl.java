@@ -241,9 +241,29 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
     }
 
     @Override
+    public PhotoTemplate createTemplate(PhotoTemplate template, MultipartFile file) {
+        try {
+            // 上传模板图片
+            String imagePath = uploadTemplate(file);
+            template.setImagePath(imagePath);
+            
+            // 设置所属用户ID
+            template.setUserId(UserContext.getUserId());
+            
+            // 保存模板
+            save(template);
+            
+            return template;
+        } catch (Exception e) {
+            throw new RuntimeException("创建模板失败：" + e.getMessage());
+        }
+    }
+
+    @Override
     public List<PhotoTemplate> getActiveTemplates() {
         LambdaQueryWrapper<PhotoTemplate> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(PhotoTemplate::getStatus, 1);
+        wrapper.eq(PhotoTemplate::getStatus, 1)
+               .eq(PhotoTemplate::getUserId, UserContext.getUserId());
         return list(wrapper);
     }
 
