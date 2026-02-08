@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员后台 - 图片文字合成系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #5f7fff;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --success-dark: #38b2e0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 16px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            color: var(--dark);
+            padding: 0;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-badge {
+            background: var(--danger);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--gray-100);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .tab {
+            padding: 20px 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-600);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            background: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .tab-content {
+            padding: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .stat-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: var(--gray-100);
+            padding: 15px;
+            text-align: left;
+            color: var(--gray-700);
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .data-table td {
+            padding: 15px;
+            color: var(--gray-700);
+            font-size: 14px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .data-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .page-info {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 25px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-dark);
+            border-left: 4px solid var(--success);
+        }
+
+        .message.error {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .logout-modal {
+            display: none;
+            position: fixed;
+            z-index: 9998;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .logout-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logout-modal-content {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logout-modal-icon {
+            font-size: 48px;
+            color: var(--success);
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .logout-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 10px;
+        }
+
+        .logout-modal-message {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease 0.3s both;
+        }
+
+        .logout-modal-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(76, 201, 240, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--success);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-badge.admin {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+        }
+
+        .role-badge.user {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-dark);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+                height: 60px;
+            }
+
+            .logo h1 {
+                font-size: 20px;
+            }
+
+            .tab-content {
+                padding: 25px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-image logo-icon"></i>
+                    <h1>图片文字合成系统<span class="admin-badge">管理员</span></h1>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">A</div>
+                    <span id="username-display">管理员</span>
+                    <button class="btn btn-primary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>退出登录
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="dashboard-card">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('statistics')">
+                        <i class="fas fa-chart-bar"></i>统计信息
+                    </button>
+                    <button class="tab" onclick="switchTab('users')">
+                        <i class="fas fa-users"></i>用户管理
+                    </button>
+                    <button class="tab" onclick="switchTab('usage')">
+                        <i class="fas fa-history"></i>使用记录
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="message" id="message"></div>
+
+                    <!-- 统计信息 -->
+                    <div id="statistics-tab">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <i class="fas fa-users stat-icon"></i>
+                                <div class="stat-label">用户总数</div>
+                                <div class="stat-value" id="stat-user-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-image stat-icon"></i>
+                                <div class="stat-label">总生成次数</div>
+                                <div class="stat-value" id="stat-total-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-calendar-day stat-icon"></i>
+                                <div class="stat-label">今日生成</div>
+                                <div class="stat-value" id="stat-today-count">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 用户管理 -->
+                    <div id="users-tab" class="hidden">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>邮箱</th>
+                                        <th>手机号</th>
+                                        <th>角色</th>
+                                        <th>创建时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 20px;">加载中...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <button class="btn btn-outline" onclick="previousUsersPage()">
+                                <i class="fas fa-chevron-left"></i>上一页
+                            </button>
+                            <span class="page-info" id="users-page-info">第 1 页</span>
+                            <button class="btn btn-outline" onclick="nextUsersPage()">
+                                下一页<i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 使用记录 -->
+                    <div id="usage-tab" class="hidden">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>生成时间</th>
+                                        <th>模板</th>
+                                        <th>数量</th>
+                                        <th>文字内容</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usage-table-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 20px;">加载中...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <button class="btn btn-outline" onclick="previousUsagePage()">
+                                <i class="fas fa-chevron-left"></i>上一页
+                            </button>
+                            <span class="page-info" id="usage-page-info">第 1 页</span>
+                            <button class="btn btn-outline" onclick="nextUsagePage()">
+                                下一页<i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 登出模态框 -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <div class="logout-modal-title">正在登出...</div>
+            <div class="logout-modal-message">请稍候，正在安全退出您的账户</div>
+            <div class="logout-modal-spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+        let role = localStorage.getItem('role');
+        let username = localStorage.getItem('username');
+        
+        let usersCurrentPage = 1;
+        let usersTotalPages = 1;
+        let usageCurrentPage = 1;
+        let usageTotalPages = 1;
+
+        // 初始化页面
+        function initPage() {
+            // 检查是否是管理员
+            if (role !== '1' && role !== 1) {
+                showMessage('无权限访问此页面', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                return;
+            }
+
+            // 设置用户信息
+            if (username) {
+                document.getElementById('user-avatar').textContent = username.charAt(0).toUpperCase();
+                document.getElementById('username-display').textContent = username;
+            }
+
+            // 确保DOM完全加载后再加载数据
+            setTimeout(() => {
+                console.log('开始加载统计数据...');
+                loadStatistics();
+                loadUsers();
+                loadUsageRecords();
+            }, 100);
+        }
+
+        // 检查token有效性
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            return originalFetch.apply(this, args).then(response => {
+                if (response.status === 401) {
+                    handle401Error();
+                }
+                return response;
+            });
+        };
+
+        function handle401Error() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            showMessage('登录已过期，请重新登录', 'error');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('[id$="-tab"]').forEach(t => t.classList.add('hidden'));
+            
+            // 找到被点击的标签页按钮
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(btn => {
+                if (btn.getAttribute('onclick').includes(tab)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            document.getElementById(tab + '-tab').classList.remove('hidden');
+        }
+
+        async function loadStatistics() {
+            try {
+                console.log('开始加载统计数据，token:', token);
+                const response = await fetch('/api/admin/statistics', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await response.json();
+                console.log('统计数据响应:', result);
+                
+                if (result.code === 200) {
+                    const stats = result.data;
+                    console.log('统计数据详情:', {
+                        userCount: stats.userCount,
+                        totalCount: stats.totalCount,
+                        todayCount: stats.todayCount
+                    });
+                    
+                    // 直接更新DOM，不使用条件判断
+                    const userCountEl = document.getElementById('stat-user-count');
+                    const totalCountEl = document.getElementById('stat-total-count');
+                    const todayCountEl = document.getElementById('stat-today-count');
+                    
+                    console.log('DOM元素检查:', {
+                        userCountEl: !!userCountEl,
+                        totalCountEl: !!totalCountEl,
+                        todayCountEl: !!todayCountEl
+                    });
+                    
+                    // 强制更新文本内容
+                    if (userCountEl) {
+                        userCountEl.textContent = String(stats.userCount || 0);
+                        console.log('已更新用户总数:', userCountEl.textContent);
+                    }
+                    if (totalCountEl) {
+                        totalCountEl.textContent = String(stats.totalCount || 0);
+                        console.log('已更新总生成次数:', totalCountEl.textContent);
+                    }
+                    if (todayCountEl) {
+                        todayCountEl.textContent = String(stats.todayCount || 0);
+                        console.log('已更新今日生成:', todayCountEl.textContent);
+                    }
+                } else {
+                    console.error('统计数据返回错误:', result);
+                    showMessage('获取统计数据失败: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('加载统计信息失败:', error);
+                showMessage('加载统计信息失败: ' + error.message, 'error');
+            }
+        }
+
+        async function loadUsers(page = 1) {
+            try {
+                const response = await fetch(`/api/admin/users?page=${page}&size=10`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const data = result.data;
+                    const records = data.records || [];
+                    usersCurrentPage = data.current || page;
+                    usersTotalPages = data.pages || 1;
+                    
+                    const tbody = document.getElementById('users-table-body');
+                    
+                    if (records.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">暂无用户</td></tr>';
+                    } else {
+                        tbody.innerHTML = records.map(user => `
+                            <tr>
+                                <td>${user.username || '-'}</td>
+                                <td>${user.email || '-'}</td>
+                                <td>${user.phone || '-'}</td>
+                                <td>
+                                    <span class="role-badge ${user.role === 1 ? 'admin' : 'user'}">
+                                        ${user.role === 1 ? '管理员' : '普通用户'}
+                                    </span>
+                                </td>
+                                <td>${formatDate(user.createTime)}</td>
+                            </tr>
+                        `).join('');
+                    }
+                    
+                    document.getElementById('users-page-info').textContent = `第 ${usersCurrentPage} 页 / 共 ${usersTotalPages} 页`;
+                }
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+                document.getElementById('users-table-body').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载失败</td></tr>';
+            }
+        }
+
+        async function loadUsageRecords(page = 1) {
+            try {
+                const response = await fetch(`/api/admin/usage-records?page=${page}&size=10`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    const data = result.data;
+                    const records = data.records || [];
+                    usageCurrentPage = data.current || page;
+                    usageTotalPages = data.pages || 1;
+                    
+                    const tbody = document.getElementById('usage-table-body');
+                    
+                    if (records.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">暂无使用记录</td></tr>';
+                    } else {
+                        tbody.innerHTML = records.map(record => `
+                            <tr>
+                                <td>${record.username || '-'}</td>
+                                <td>${formatDate(record.createTime)}</td>
+                                <td>${record.templateName || '-'}</td>
+                                <td>${record.count}</td>
+                                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${record.textContent || ''}">${record.textContent || '-'}</td>
+                            </tr>
+                        `).join('');
+                    }
+                    
+                    document.getElementById('usage-page-info').textContent = `第 ${usageCurrentPage} 页 / 共 ${usageTotalPages} 页`;
+                }
+            } catch (error) {
+                console.error('加载使用记录失败:', error);
+                document.getElementById('usage-table-body').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载失败</td></tr>';
+            }
+        }
+
+        function previousUsersPage() {
+            if (usersCurrentPage > 1) {
+                loadUsers(usersCurrentPage - 1);
+            }
+        }
+
+        function nextUsersPage() {
+            if (usersCurrentPage < usersTotalPages) {
+                loadUsers(usersCurrentPage + 1);
+            }
+        }
+
+        function previousUsagePage() {
+            if (usageCurrentPage > 1) {
+                loadUsageRecords(usageCurrentPage - 1);
+            }
+        }
+
+        function nextUsagePage() {
+            if (usageCurrentPage < usageTotalPages) {
+                loadUsageRecords(usageCurrentPage + 1);
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        async function logout() {
+            // 显示登出模态框
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.classList.add('show');
+            
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            // 延迟一下以显示动画效果
+            setTimeout(() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                localStorage.removeItem('role');
+                window.location.href = 'login.html';
+            }, 1500);
+        }
+
+        // 初始化页面
+        initPage();
+    </script>
+</body>
+</html>

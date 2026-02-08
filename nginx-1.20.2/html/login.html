@@ -398,6 +398,7 @@
     <script>
         localStorage.removeItem('token');
         localStorage.removeItem('username');
+        localStorage.removeItem('role');
         
         function disableAllButtons(disabled) {
             const buttons = document.querySelectorAll('button');
@@ -442,9 +443,17 @@
                 if (result.code === 200) {
                     localStorage.setItem('token', result.data.token);
                     localStorage.setItem('username', result.data.username);
+                    // 保存role到localStorage，用于前端权限控制
+                    if (result.data.role !== undefined) {
+                        localStorage.setItem('role', result.data.role);
+                        console.log('保存role到localStorage:', result.data.role);
+                    } else {
+                        console.log('role未定义，响应数据:', result.data);
+                    }
                     
                     // 延迟一下以显示动画效果
                     setTimeout(() => {
+                        // 所有用户统一跳转到index.html
                         window.location.href = 'index.html';
                     }, 1500);
                 } else {

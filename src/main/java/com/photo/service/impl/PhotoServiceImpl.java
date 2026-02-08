@@ -62,6 +62,17 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
     }
 
     /**
+     * 获取文件的绝对路径
+     */
+    private String getAbsolutePath(String relativePath) {
+        if (new File(relativePath).isAbsolute()) {
+            return relativePath;
+        }
+        String projectRoot = System.getProperty("user.dir");
+        return projectRoot + File.separator + relativePath;
+    }
+
+    /**
      * 内部方法：生成图片（不保存记录）
      */
     private String generatePhotoInternal(String text, Long templateId) {
@@ -72,8 +83,9 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
                 throw new RuntimeException("模板不存在");
             }
 
-            // 读取模板图片
-            File templateFile = new File(template.getImagePath());
+            // 读取模板图片（处理相对路径）
+            String absolutePath = getAbsolutePath(template.getImagePath());
+            File templateFile = new File(absolutePath);
             if (!templateFile.exists()) {
                 throw new RuntimeException("模板图片不存在");
             }
@@ -215,8 +227,12 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
     @Override
     public String uploadTemplate(MultipartFile file) {
         try {
+            // 获取项目根目录
+            String projectRoot = System.getProperty("user.dir");
+            String fullTemplatePath = projectRoot + File.separator + templatePath;
+            
             // 创建模板目录
-            File templateDir = new File(templatePath);
+            File templateDir = new File(fullTemplatePath);
             if (!templateDir.exists()) {
                 templateDir.mkdirs();
             }
@@ -225,11 +241,12 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String fileName = IdUtil.simpleUUID() + extension;
-            String filePath = templatePath + fileName;
+            String filePath = fullTemplatePath + fileName;
 
             file.transferTo(new File(filePath));
 
-            return filePath;
+            // 返回相对路径用于存储到数据库
+            return templatePath + fileName;
         } catch (IOException e) {
             throw new RuntimeException("上传失败：" + e.getMessage());
         }

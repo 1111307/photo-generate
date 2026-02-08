@@ -59,7 +59,7 @@ public class PhotoController {
                                                 @RequestParam(value = "textY", defaultValue = "0") Integer textY,
                                                 @RequestParam(value = "textWidth", defaultValue = "0") Integer textWidth,
                                                 @RequestParam(value = "textHeight", defaultValue = "0") Integer textHeight,
-                                                @RequestParam(value = "fontSize", defaultValue = "24") Integer fontSize,
+                                                @RequestParam(value = "fontSize", defaultValue = "37") Integer fontSize,
                                                 @RequestParam(value = "fontColor", defaultValue = "#000000") String fontColor) {
         try {
             PhotoTemplate template = new PhotoTemplate();
@@ -234,4 +234,58 @@ public class PhotoController {
             return Result.error(e.getMessage());
         }
     }
+
+   /**
+    * 获取当前用户的所有模板（分页）
+    */
+   @GetMapping("/my-templates")
+   public Result<Map<String, Object>> getMyTemplates(@RequestParam(defaultValue = "1") Integer page,
+                                                     @RequestParam(defaultValue = "5") Integer size) {
+       try {
+           String userId = UserContext.getUserId();
+
+           Page<PhotoTemplate> templatePage = new Page<>(page, size);
+           LambdaQueryWrapper<PhotoTemplate> wrapper = new LambdaQueryWrapper<>();
+           wrapper.eq(PhotoTemplate::getUserId, userId)
+                   .orderByDesc(PhotoTemplate::getId);
+
+           Page<PhotoTemplate> result = photoService.page(templatePage, wrapper);
+
+           Map<String, Object> response = new HashMap<>();
+           response.put("records", result.getRecords());
+           response.put("total", result.getTotal());
+           response.put("pages", result.getPages());
+           response.put("current", result.getCurrent());
+
+           return Result.success(response);
+       } catch (Exception e) {
+           return Result.error(e.getMessage());
+       }
+   }
+
+   /**
+    * 删除指定模板
+    */
+   @DeleteMapping("/template/{id}")
+   public Result<String> deleteTemplate(@PathVariable Long id) {
+       try {
+           String userId = UserContext.getUserId();
+           
+           // 验证模板所有者
+           PhotoTemplate template = photoService.getById(id);
+           if (template == null) {
+               return Result.error("模板不存在");
+           }
+           
+           if (!template.getUserId().equals(userId)) {
+               return Result.error("无权删除他人的模板");
+           }
+           
+           // 删除模板
+           photoService.removeById(id);
+           return Result.success("删除成功");
+       } catch (Exception e) {
+           return Result.error("删除失败：" + e.getMessage());
+       }
+   }
 }

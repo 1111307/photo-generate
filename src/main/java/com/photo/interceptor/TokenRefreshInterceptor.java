@@ -1,7 +1,5 @@
 package com.photo.interceptor;
 
-import com.photo.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -10,54 +8,40 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- * Token刷新拦截器
- * 第一次拦截：检查token是否即将过期，如果即将过期则生成新token并通过响应头返回
- * 实现token无感知刷新，前端需要监听响应头中的新token并更新
+ * Session刷新拦截器
+ * 当Session剩余时间 < 1/3 TTL时，刷新Session有效期
+ * Token存储在Session中，Session刷新时Token也会被刷新
  */
 @Component
 public class TokenRefreshInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
     private static final String TOKEN_SESSION_KEY = "token";
-    private static final String USER_SESSION_KEY = "user";
+    private static final int SESSION_MAX_INACTIVE_INTERVAL = 1200; // 20分钟
+    private static final long SESSION_REFRESH_THRESHOLD = SESSION_MAX_INACTIVE_INTERVAL * 1000 / 3; // 1/3 TTL
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token = request.getHeader("Authorization");
+        HttpSession session = request.getSession(false);
         
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-            HttpSession session = request.getSession(false);
+        if (session != null) {
+            // 检查token是否在session中
+            String sessionToken = (String) session.getAttribute(TOKEN_SESSION_KEY);
             
-            if (session != null) {
-                // 检查token是否在session中
-                String sessionToken = (String) session.getAttribute(TOKEN_SESSION_KEY);
+            if (sessionToken != null) {
+                // 获取Session创建时间
+                long creationTime = session.getCreationTime();
+                long currentTime = System.currentTimeMillis();
+                long sessionAge = currentTime - creationTime;
+                long sessionRemainingTime = SESSION_MAX_INACTIVE_INTERVAL * 1000 - sessionAge;
                 
-                if (sessionToken != null && sessionToken.equals(token)) {
-                    // Token在session中，刷新session有效期
-                    session.setMaxInactiveInterval(1200); // 20分钟
-                    
-                    // 检查token是否即将过期（剩余时间小于有效期的1/3）
-                    if (jwtUtil.canTokenBeRefreshed(token)) {
-                        // 生成新token
-                        String newToken = jwtUtil.refreshToken(token);
-                        
-                        if (newToken != null) {
-                            // 更新session中的token
-                            session.setAttribute(TOKEN_SESSION_KEY, newToken);
-                            
-                            // 将新token通过响应头返回给前端
-                            response.setHeader("Authorization", "Bearer " + newToken);
-                            response.setHeader("Access-Control-Expose-Headers", "Authorization");
-                        }
-                    }
+                // 如果Session剩余时间 < 1/3 TTL，刷新Session有效期
+                if (sessionRemainingTime > 0 && sessionRemainingTime < SESSION_REFRESH_THRESHOLD) {
+                    session.setMaxInactiveInterval(SESSION_MAX_INACTIVE_INTERVAL);
                 }
             }
         }
         
-        // 无论token是否在session中，都放行
+        // 放行请求
         return true;
     }
 }

@@ -95,4 +95,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.eq(User::getUsername, username);
         return getOne(wrapper);
     }
+
+    @Override
+    public boolean changePassword(String userId, String oldPassword, String newPassword) {
+        // 根据userId查询用户
+        User user = getById(userId);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+
+        // 验证原密码是否正确
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+
+        // 验证新密码与原密码是否相同
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new RuntimeException("新密码不能与原密码相同");
+        }
+
+        // 使用BCrypt加密新密码并更新
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return updateById(user);
+    }
 }
