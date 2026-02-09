@@ -723,7 +723,7 @@
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow-xl);
             padding: 40px;
-            max-width: 600px;
+            max-width: 900px;
             width: 90%;
             animation: slideUp 0.3s ease;
             max-height: 80vh;
@@ -769,6 +769,14 @@
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 15px;
+        }
+
+        .account-modal-logout-btn .btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 14px;
         }
 
         .account-tab-content {
@@ -1322,9 +1330,58 @@
             </div>
 
             <div class="account-modal-logout-btn">
-                <button class="btn btn-primary" onclick="logout()" style="width: 100%;">
+                <button class="btn btn-primary" onclick="openChangePasswordModal()">
+                    <i class="fas fa-key"></i>修改密码
+                </button>
+                <button class="btn btn-primary" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>退出登录
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改密码模态框 -->
+    <div id="changePasswordModal" class="account-modal">
+        <div class="account-modal-content">
+            <div class="account-modal-header">
+                <div class="account-modal-title">修改密码</div>
+                <button class="account-modal-close" onclick="closeChangePasswordModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="account-tab-content">
+                <div class="message" id="change-password-message"></div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="old-password">
+                        <i class="fas fa-lock"></i>原密码
+                    </label>
+                    <input type="password" class="form-control" id="old-password" placeholder="请输入原密码">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="new-password">
+                        <i class="fas fa-lock"></i>新密码
+                    </label>
+                    <input type="password" class="form-control" id="new-password" placeholder="请输入新密码（至少8个字符）">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="confirm-password">
+                        <i class="fas fa-lock"></i>确认密码
+                    </label>
+                    <input type="password" class="form-control" id="confirm-password" placeholder="请再次输入新密码">
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="submitChangePassword()" style="flex: 1;">
+                        <i class="fas fa-save"></i>确认修改
+                    </button>
+                    <button class="btn btn-outline" onclick="closeChangePasswordModal()" style="flex: 1;">
+                        <i class="fas fa-times"></i>取消
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2676,6 +2733,244 @@
                 loadMyTemplates(1);
             }
         };
+
+        // 打开修改密码模态框
+        function openChangePasswordModal() {
+            const modal = document.getElementById('changePasswordModal');
+            modal.classList.add('show');
+            // 清空表单
+            document.getElementById('old-password').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+            // 清空提示信息
+            const messageDiv = document.getElementById('change-password-message');
+            messageDiv.style.display = 'none';
+        }
+
+        // 关闭修改密码模态框
+        function closeChangePasswordModal() {
+            const modal = document.getElementById('changePasswordModal');
+            modal.classList.remove('show');
+            // 清空表单
+            document.getElementById('old-password').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+            // 清空提示信息
+            const messageDiv = document.getElementById('change-password-message');
+            messageDiv.style.display = 'none';
+        }
+
+        // 显示修改密码提示信息
+        function showChangePasswordMessage(text, type) {
+            const messageDiv = document.getElementById('change-password-message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+            
+            // 错误信息3秒后自动隐藏
+            if (type === 'error') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // 点击模态框背景关闭
+        document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeChangePasswordModal();
+            }
+        });
+
+        // 提交修改密码
+        async function submitChangePassword() {
+            const oldPassword = document.getElementById('old-password').value.trim();
+            const newPassword = document.getElementById('new-password').value.trim();
+            const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+            // 验证表单 - 按照标准修改密码流程
+            if (!oldPassword) {
+                showChangePasswordMessage('请输入原密码', 'error');
+                return;
+            }
+
+            if (!newPassword) {
+                showChangePasswordMessage('请输入新密码', 'error');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                showChangePasswordMessage('新密码至少需要8个字符', 'error');
+                return;
+            }
+
+            if (!confirmPassword) {
+                showChangePasswordMessage('请输入确认密码', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showChangePasswordMessage('两次输入的密码不一致', 'error');
+                return;
+            }
+
+            if (oldPassword === newPassword) {
+                showChangePasswordMessage('新密码不能与原密码相同', 'error');
+                return;
+            }
+
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loading"></div> 修改中...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        oldPassword: oldPassword,
+                        newPassword: newPassword,
+                        confirmPassword: confirmPassword
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    // 显示加载中的提示
+                    showChangePasswordMessage('密码修改成功，正在处理...', 'success');
+                    
+                    // 延迟后清除token并刷新页面
+                    setTimeout(() => {
+                        // 修改密码成功，清除token使其失效
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('role');
+                        token = null;
+                        
+                        // 关闭模态框
+                        closeChangePasswordModal();
+                        
+                        // 显示最终成功提示
+                        showMessage('密码已修改，请使用新密码重新登录', 'success');
+                        
+                        // 再延迟后刷新页面
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    }, 1500);
+                } else {
+                    showChangePasswordMessage(result.message || '密码修改失败', 'error');
+                }
+            } catch (error) {
+                console.error('修改密码错误:', error);
+        // 修改密码后执行登出逻辑
+        function performLogoutAfterPasswordChange() {
+            // 清除本地存储
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            isLoggedIn = false;
+            token = null;
+            userRole = null;
+            
+            // 关闭所有模态框
+            const accountModal = document.getElementById('accountModal');
+            if (accountModal) {
+                accountModal.classList.remove('show');
+            }
+            
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal) {
+                imageModal.style.display = 'none';
+            }
+            
+            // 清空模板下拉框
+            document.getElementById('template-select').innerHTML = '<option value="">请选择模板</option>';
+            document.getElementById('batch-template-select').innerHTML = '<option value="">请选择模板</option>';
+            templates = [];
+            
+            // 隐藏模板预览
+            document.getElementById('single-template-preview').style.display = 'none';
+            document.getElementById('batch-template-preview').style.display = 'none';
+            
+            // 清空预览结果
+            document.getElementById('single-preview').innerHTML = '';
+            document.getElementById('batch-preview').innerHTML = '';
+            document.getElementById('single-preview-section').style.display = 'none';
+            document.getElementById('batch-preview-section').style.display = 'none';
+            
+            // 清空预览图片src
+            document.getElementById('single-template-image').src = '';
+            document.getElementById('batch-template-image').src = '';
+            
+            // 清空所有表单输入
+            document.getElementById('single-text').value = '';
+            document.getElementById('batch-text').value = '';
+            document.getElementById('template-name').value = '';
+            document.getElementById('template-file').value = '';
+            document.getElementById('excel-file').value = '';
+            
+            // 清空模板预览表单
+            document.getElementById('template-preview-img').src = '';
+            document.getElementById('template-preview-section').style.display = 'none';
+            document.getElementById('text-area-settings').style.display = 'none';
+            document.getElementById('text-x').value = '0';
+            document.getElementById('text-y').value = '0';
+            document.getElementById('text-width').value = '0';
+            document.getElementById('text-height').value = '0';
+            document.getElementById('font-size').value = '37';
+            document.getElementById('font-color').value = '#000000';
+            document.getElementById('coord-display').textContent = '请在图片上点击并拖动来标注文字区域';
+            
+            // 清空所有表格数据
+            document.getElementById('modal-usage-records').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载中...</td></tr>';
+            document.getElementById('my-templates-tbody').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">加载中...</td></tr>';
+            document.getElementById('admin-users-tbody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载中...</td></tr>';
+            document.getElementById('admin-records-tbody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载中...</td></tr>';
+            
+            // 重置分页信息
+            document.getElementById('modal-page-info').textContent = '第 1 页';
+            document.getElementById('my-templates-page-info').textContent = '第 1 页';
+            document.getElementById('admin-users-page-info').textContent = '第 1 页';
+            document.getElementById('admin-records-page-info').textContent = '第 1 页';
+            
+            // 重置统计数据
+            document.getElementById('modal-today-count').textContent = '0';
+            document.getElementById('modal-month-count').textContent = '0';
+            document.getElementById('modal-total-count').textContent = '0';
+            document.getElementById('admin-user-count').textContent = '0';
+            document.getElementById('admin-total-generate').textContent = '0';
+            document.getElementById('admin-today-generate').textContent = '0';
+            
+            // 重置标签页状态
+            currentPage = 1;
+            totalPages = 1;
+            modalCurrentPage = 1;
+            modalTotalPages = 1;
+            adminCurrentPage = 1;
+            adminTotalPages = 1;
+            myTemplatesCurrentPage = 1;
+            myTemplatesTotalPages = 1;
+            currentImages = [];
+            isDrawing = false;
+            
+            // 更新UI为未登录状态
+            initPage();
+            
+            // 显示提示信息
+            showMessage('密码已修改，请使用新密码重新登录', 'success');
+        }
+                showChangePasswordMessage('修改密码失败：' + error.message, 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>

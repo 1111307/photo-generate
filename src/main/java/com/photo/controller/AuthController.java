@@ -3,6 +3,7 @@ package com.photo.controller;
 import com.photo.common.Result;
 import com.photo.entity.User;
 import com.photo.service.UserService;
+import com.photo.util.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -175,6 +176,12 @@ public class AuthController {
 
             boolean success = userService.changePassword(user.getId(), oldPassword, newPassword);
             if (success) {
+                // 修改密码成功后，清除session，使当前token失效
+                session.removeAttribute("token");
+                session.removeAttribute("user");
+                // 从SessionManager映射表中删除此session
+                SessionManager.removeUserSession(session);
+                session.invalidate();
                 return Result.success("密码修改成功");
             } else {
                 return Result.error("原密码错误");

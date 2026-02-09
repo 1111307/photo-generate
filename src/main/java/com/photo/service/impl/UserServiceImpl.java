@@ -86,6 +86,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 移除用户Session映射
         SessionManager.removeUserSession(session);
         
+        // 使session失效
+        session.invalidate();
+        
         return true;
     }
 
