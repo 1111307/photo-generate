@@ -948,8 +948,11 @@
                             <label class="form-label">
                                 <i class="fas fa-eye"></i>模板预览
                             </label>
-                            <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px;">
-                                <img id="single-template-image" src="" alt="模板预览" style="max-width: 100%; max-height: 300px; border-radius: var(--border-radius-sm);">
+                            <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px; position: relative; overflow: auto; max-height: 600px;">
+                                <div style="position: relative; display: inline-block;">
+                                    <img id="single-template-image" src="" alt="模板预览" style="max-width: 25%; border-radius: var(--border-radius-sm); display: block;">
+                                    <canvas id="single-template-canvas" style="position: absolute; top: 0; left: 0; cursor: crosshair;"></canvas>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -987,8 +990,11 @@
                             <label class="form-label">
                                 <i class="fas fa-eye"></i>模板预览
                             </label>
-                            <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px;">
-                                <img id="batch-template-image" src="" alt="模板预览" style="max-width: 100%; max-height: 300px; border-radius: var(--border-radius-sm);">
+                            <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px; position: relative; overflow: auto; max-height: 600px;">
+                                <div style="position: relative; display: inline-block;">
+                                    <img id="batch-template-image" src="" alt="模板预览" style="max-width: 25%; border-radius: var(--border-radius-sm); display: block;">
+                                    <canvas id="batch-template-canvas" style="position: absolute; top: 0; left: 0; cursor: crosshair;"></canvas>
+                                </div>
                             </div>
                         </div>
                         
@@ -1053,12 +1059,25 @@
                             <label class="form-label">
                                 <i class="fas fa-eye"></i>图片预览
                             </label>
-                            <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px; position: relative;">
-                                <img id="template-preview-img" src="" alt="模板预览" style="max-width: 100%; max-height: 400px; border-radius: var(--border-radius-sm);">
-                                <div id="template-coordinates-info" style="margin-top: 15px; padding: 15px; background: var(--gray-100); border-radius: var(--border-radius-sm); text-align: left; font-size: 13px; color: var(--gray-700);">
-                                    <p><strong>点击图片标注文字区域：</strong></p>
-                                    <p id="coord-display">请在图片上点击并拖动来标注文字区域</p>
+                            <div style="display: flex; gap: 15px; align-items: flex-start;">
+                                <div style="flex: 1; text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px; position: relative; overflow: auto; max-height: 600px;">
+                                    <div style="position: relative; display: inline-block;">
+                                        <img id="template-preview-img" src="" alt="模板预览" style="max-width: 100%; border-radius: var(--border-radius-sm); display: block;">
+                                        <canvas id="template-preview-canvas" style="position: absolute; top: 0; left: 0; cursor: crosshair;"></canvas>
+                                    </div>
                                 </div>
+                                <div style="width: 200px;">
+                                    <div style="padding: 15px; background: var(--gray-100); border-radius: var(--border-radius-sm);">
+                                        <p style="font-size: 12px; color: var(--gray-600); margin-bottom: 10px;"><strong>文字预览</strong></p>
+                                        <div id="font-size-preview" style="width: 100%; height: 80px; border: 1px solid var(--gray-300); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: center; background: white; overflow: hidden;">
+                                            <span id="preview-text" style="font-weight: bold;">文字区域</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="template-coordinates-info" style="margin-top: 15px; padding: 15px; background: var(--gray-100); border-radius: var(--border-radius-sm); text-align: left; font-size: 13px; color: var(--gray-700);">
+                                <p><strong>在图片上拖动鼠标标注文字区域：</strong></p>
+                                <p id="coord-display">请在图片上拖动鼠标来标注文字区域</p>
                             </div>
                         </div>
 
@@ -1084,12 +1103,16 @@
                                     <input type="number" class="form-control" id="text-height" value="0" min="0">
                                 </div>
                                 <div>
+                                    <label class="form-label" style="font-size: 13px;">覆盖颜色</label>
+                                    <input type="color" class="form-control" id="cover-color" value="#ffffff" style="height: 45px; cursor: pointer;">
+                                </div>
+                                <div>
                                     <label class="form-label" style="font-size: 13px;">字体大小</label>
-                                    <input type="number" class="form-control" id="font-size" value="37" min="8" max="72">
+                                    <input type="number" class="form-control" id="font-size" value="37" min="8" max="72" onchange="updateFontSizePreview()" oninput="updateFontSizePreview()">
                                 </div>
                                 <div>
                                     <label class="form-label" style="font-size: 13px;">字体颜色</label>
-                                    <input type="color" class="form-control" id="font-color" value="#000000" style="height: 45px; cursor: pointer;">
+                                    <input type="color" class="form-control" id="font-color" value="#000000" style="height: 45px; cursor: pointer;" onchange="updateFontSizePreview()" oninput="updateFontSizePreview()">
                                 </div>
                             </div>
                         </div>
@@ -1097,9 +1120,6 @@
                         <div class="action-buttons">
                             <button class="btn btn-primary" onclick="submitTemplate()">
                                 <i class="fas fa-save"></i>保存模板
-                            </button>
-                            <button class="btn btn-outline" onclick="resetTemplateForm()">
-                                <i class="fas fa-redo"></i>重置
                             </button>
                         </div>
 
@@ -1618,13 +1638,80 @@
                 // 添加点击事件，使图片可以被打开查看
                 image.style.cursor = 'pointer';
                 image.onclick = function() {
-                    openModal(template.imagePath, template.templateName);
+                    openModal(template.imagePath, template.templateName, {
+                        textX: template.textX,
+                        textY: template.textY,
+                        textWidth: template.textWidth,
+                        textHeight: template.textHeight,
+                        fontSize: template.fontSize
+                    });
                 };
                 previewDiv.style.display = 'block';
+                
+                // 如果模板有坐标信息，在预览图片上绘制红色框
+                if (template.textX || template.textY || template.textWidth || template.textHeight) {
+                    image.onload = function() {
+                        drawRedBoxOnPreview(image, template);
+                    };
+                    // 如果图片已缓存
+                    if (image.complete) {
+                        drawRedBoxOnPreview(image, template);
+                    }
+                }
             } else {
                 previewDiv.style.display = 'none';
             }
         }
+        
+        // 在预览图片上绘制红色框
+         function drawRedBoxOnPreview(img, template) {
+             // 查找或创建覆盖层canvas
+             let overlayCanvas = document.getElementById(img.id + '-overlay');
+             if (overlayCanvas) {
+                 overlayCanvas.remove();
+             }
+             
+             overlayCanvas = document.createElement('canvas');
+             overlayCanvas.id = img.id + '-overlay';
+             overlayCanvas.style.position = 'absolute';
+             overlayCanvas.style.cursor = 'pointer';
+             overlayCanvas.style.pointerEvents = 'none';
+             overlayCanvas.style.zIndex = '10';
+             
+             // 将canvas插入到图片后面
+             img.parentNode.insertBefore(overlayCanvas, img.nextSibling);
+             
+             // 等待图片加载完成
+             setTimeout(() => {
+                 const imageRect = img.getBoundingClientRect();
+                 
+                 overlayCanvas.width = imageRect.width;
+                 overlayCanvas.height = imageRect.height;
+                 overlayCanvas.style.left = '0';
+                 overlayCanvas.style.top = '0';
+                 
+                 const overlayCtx = overlayCanvas.getContext('2d');
+                 
+                 // 计算缩放比例（显示宽高 / 自然宽高）
+                 const scaleX = img.naturalWidth / imageRect.width;
+                 const scaleY = img.naturalHeight / imageRect.height;
+                 
+                 // template中的坐标是相对坐标（0-1之间的比例），需要转换为自然宽高的绝对坐标
+                 const x1 = (template.textX || 0) * img.naturalWidth;
+                 const y1 = (template.textY || 0) * img.naturalHeight;
+                 const width = (template.textWidth || 0) * img.naturalWidth;
+                 const height = (template.textHeight || 0) * img.naturalHeight;
+                 
+                 // 绘制红色框（转换为显示坐标）
+                 overlayCtx.strokeStyle = '#e63946';
+                 overlayCtx.lineWidth = 3;
+                 overlayCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
+                 overlayCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+                 overlayCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+                 
+                 // 不在预览中显示文字标签
+             }, 100);
+         }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2385,21 +2472,258 @@
         });
 
         // 图片查看模态框功能
-        function openModal(imageSrc, caption) {
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
-            const modalCaption = document.getElementById('modalCaption');
+         function openModal(imageSrc, caption, templateData) {
+             const modal = document.getElementById('imageModal');
+             const modalImg = document.getElementById('modalImage');
+             const modalCaption = document.getElementById('modalCaption');
+             
+             modal.style.display = 'block';
+             modalImg.src = imageSrc;
+             modalCaption.textContent = caption || '';
+             document.body.style.overflow = 'hidden';
+             
+             // 如果有模板数据，绘制红色框（模板预览）
+             if (templateData && (templateData.textX || templateData.textY || templateData.textWidth || templateData.textHeight)) {
+                 modalImg.onload = function() {
+                     drawRedBoxOnModal(modalImg, templateData);
+                 };
+                 // 如果图片已缓存
+                 if (modalImg.complete) {
+                     drawRedBoxOnModal(modalImg, templateData);
+                 }
+             } else {
+                 // 如果没有模板数据，初始化模态框中的框选功能
+                 modalImg.onload = function() {
+                     initModalCanvasForDrawing(modalImg);
+                 };
+                 // 如果图片已缓存
+                 if (modalImg.complete) {
+                     initModalCanvasForDrawing(modalImg);
+                 }
+             }
+         }
+
+        // 在模态框中绘制红色框
+        function drawRedBoxOnModal(img, templateData) {
+            // 创建覆盖层canvas
+            let overlayCanvas = document.getElementById('modalOverlayCanvas');
+            if (overlayCanvas) {
+                overlayCanvas.remove();
+            }
             
-            modal.style.display = 'block';
-            modalImg.src = imageSrc;
-            modalCaption.textContent = caption || '';
-            document.body.style.overflow = 'hidden';
+            overlayCanvas = document.createElement('canvas');
+            overlayCanvas.id = 'modalOverlayCanvas';
+            overlayCanvas.style.position = 'absolute';
+            overlayCanvas.style.cursor = 'pointer';
+            overlayCanvas.style.zIndex = '10001';
+            overlayCanvas.style.pointerEvents = 'none';
+            document.getElementById('imageModal').appendChild(overlayCanvas);
+            
+            // 等待图片加载完成
+            setTimeout(() => {
+                const imageRect = img.getBoundingClientRect();
+                const scaleX = img.naturalWidth / imageRect.width;
+                const scaleY = img.naturalHeight / imageRect.height;
+                
+                overlayCanvas.width = imageRect.width;
+                overlayCanvas.height = imageRect.height;
+                overlayCanvas.style.left = imageRect.left + 'px';
+                overlayCanvas.style.top = imageRect.top + 'px';
+                
+                const overlayCtx = overlayCanvas.getContext('2d');
+                const x = templateData.textX || 0;
+                const y = templateData.textY || 0;
+                const width = templateData.textWidth || 0;
+                const height = templateData.textHeight || 0;
+                
+                // 绘制红色框
+                overlayCtx.strokeStyle = '#e63946';
+                overlayCtx.lineWidth = 3;
+                overlayCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
+                overlayCtx.fillRect(x / scaleX, y / scaleY, width / scaleX, height / scaleY);
+                overlayCtx.strokeRect(x / scaleX, y / scaleY, width / scaleX, height / scaleY);
+                
+                // 在红色框内绘制提示文字
+                if (width > 0 && height > 0) {
+                    const centerX = (x + width / 2) / scaleX;
+                    const centerY = (y + height / 2) / scaleY;
+                    
+                    // 获取表单中的字体大小
+                    const fontSize = parseInt(document.getElementById('font-size').value) || 37;
+                    
+                    overlayCtx.fillStyle = '#e63946';
+                    overlayCtx.font = `bold ${fontSize}px Arial`;
+                    overlayCtx.textAlign = 'center';
+                    overlayCtx.textBaseline = 'middle';
+                    overlayCtx.fillText('文字区域', centerX, centerY);
+                }
+            }, 100);
+        }
+
+        // 在模态框中初始化框选功能
+        let modalIsDrawing = false;
+        let modalStartX, modalStartY;
+        let modalOverlayCanvas = null;
+        let modalOverlayCtx = null;
+
+        function initModalCanvasForDrawing(img) {
+            // 创建覆盖层canvas用于框选
+            let overlayCanvas = document.getElementById('modalOverlayCanvas');
+            if (overlayCanvas) {
+                overlayCanvas.remove();
+            }
+            
+            overlayCanvas = document.createElement('canvas');
+            overlayCanvas.id = 'modalOverlayCanvas';
+            overlayCanvas.style.position = 'absolute';
+            overlayCanvas.style.cursor = 'crosshair';
+            overlayCanvas.style.zIndex = '10001';
+            overlayCanvas.style.pointerEvents = 'auto';
+            document.getElementById('imageModal').appendChild(overlayCanvas);
+            
+            // 等待图片加载完成
+            setTimeout(() => {
+                const imageRect = img.getBoundingClientRect();
+                overlayCanvas.width = imageRect.width;
+                overlayCanvas.height = imageRect.height;
+                overlayCanvas.style.left = imageRect.left + 'px';
+                overlayCanvas.style.top = imageRect.top + 'px';
+                
+                modalOverlayCanvas = overlayCanvas;
+                modalOverlayCtx = overlayCanvas.getContext('2d');
+                
+                // 绑定鼠标事件
+                overlayCanvas.addEventListener('mousedown', (e) => modalStartDrawing(e, img));
+                overlayCanvas.addEventListener('mousemove', (e) => modalDrawRectangle(e, img));
+                overlayCanvas.addEventListener('mouseup', (e) => modalEndDrawing(e, img));
+                overlayCanvas.addEventListener('mouseleave', (e) => modalEndDrawing(e, img));
+            }, 100);
+        }
+
+        function modalStartDrawing(event, img) {
+            modalIsDrawing = true;
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const scaleX = img.naturalWidth / img.width;
+            const scaleY = img.naturalHeight / img.height;
+            
+            modalStartX = Math.round(x * scaleX);
+            modalStartY = Math.round(y * scaleY);
+        }
+
+        function modalDrawRectangle(event, img) {
+            if (!modalIsDrawing || !modalOverlayCtx) return;
+            
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const scaleX = img.naturalWidth / img.width;
+            const scaleY = img.naturalHeight / img.height;
+            
+            const currentX = Math.round(x * scaleX);
+            const currentY = Math.round(y * scaleY);
+            
+            // 清空canvas
+            modalOverlayCtx.clearRect(0, 0, modalOverlayCanvas.width, modalOverlayCanvas.height);
+            
+            // 计算矩形
+            const x1 = Math.min(modalStartX, currentX);
+            const y1 = Math.min(modalStartY, currentY);
+            const x2 = Math.max(modalStartX, currentX);
+            const y2 = Math.max(modalStartY, currentY);
+            
+            const width = x2 - x1;
+            const height = y2 - y1;
+            
+            // 绘制红色框
+            modalOverlayCtx.strokeStyle = '#e63946';
+            modalOverlayCtx.lineWidth = 3;
+            modalOverlayCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
+            modalOverlayCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+            modalOverlayCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+            
+            // 在红色框左上角绘制提示文字
+            if (width > 0 && height > 0) {
+                const textX = x1 / scaleX + 10;
+                const textY = y1 / scaleY + 20;
+                
+                // 获取表单中的字体大小
+                const fontSize = parseInt(document.getElementById('font-size').value) || 37;
+                
+                modalOverlayCtx.fillStyle = '#e63946';
+                modalOverlayCtx.font = `bold ${fontSize}px Arial`;
+                modalOverlayCtx.textAlign = 'left';
+                modalOverlayCtx.textBaseline = 'top';
+                modalOverlayCtx.fillText('文字区域', textX, textY);
+            }
+        }
+
+        function modalEndDrawing(event, img) {
+            if (!modalIsDrawing) return;
+            
+            modalIsDrawing = false;
+            
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const scaleX = img.naturalWidth / img.width;
+            const scaleY = img.naturalHeight / img.height;
+            
+            const endX = Math.round(x * scaleX);
+            const endY = Math.round(y * scaleY);
+            
+            // 计算矩形区域
+            const x1 = Math.min(modalStartX, endX);
+            const y1 = Math.min(modalStartY, endY);
+            const x2 = Math.max(modalStartX, endX);
+            const y2 = Math.max(modalStartY, endY);
+            
+            const width = x2 - x1;
+            const height = y2 - y1;
+            
+            if (width > 0 && height > 0) {
+                // 重新绘制最终的红色框和提示文字
+                modalOverlayCtx.clearRect(0, 0, modalOverlayCanvas.width, modalOverlayCanvas.height);
+                modalOverlayCtx.strokeStyle = '#e63946';
+                modalOverlayCtx.lineWidth = 3;
+                modalOverlayCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
+                modalOverlayCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+                modalOverlayCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+                
+                // 绘制提示文字在左上角
+                const textX = x1 / scaleX + 10;
+                const textY = y1 / scaleY + 20;
+                
+                // 获取表单中的字体大小
+                const fontSize = parseInt(document.getElementById('font-size').value) || 37;
+                
+                modalOverlayCtx.fillStyle = '#e63946';
+                modalOverlayCtx.font = `bold ${fontSize}px Arial`;
+                modalOverlayCtx.textAlign = 'left';
+                modalOverlayCtx.textBaseline = 'top';
+                modalOverlayCtx.fillText('文字区域', textX, textY);
+            }
         }
 
         function closeModal() {
             const modal = document.getElementById('imageModal');
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
+            
+            // 清除覆盖层canvas
+            const overlayCanvas = document.getElementById('modalOverlayCanvas');
+            if (overlayCanvas) {
+                overlayCanvas.remove();
+            }
+            
+            // 重置框选状态
+            modalIsDrawing = false;
+            modalOverlayCanvas = null;
+            modalOverlayCtx = null;
         }
 
         // 点击模态框背景关闭
@@ -2454,106 +2778,262 @@
             }
         });
 
-        // 处理模板图片上传
-        function handleTemplateImageUpload() {
-            if (!isLoggedIn) {
-                showMessage('请先登录', 'error');
-                return;
-            }
 
-            const fileInput = document.getElementById('template-file');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                showMessage('请选择文件', 'error');
-                return;
-            }
-
-            // 读取图片并显示预览
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.getElementById('template-preview-img');
-                img.src = e.target.result;
-                
-                // 显示预览区域和设置区域
-                document.getElementById('template-preview-section').style.display = 'block';
-                document.getElementById('text-area-settings').style.display = 'block';
-                
-                // 绑定图片点击事件用于标注坐标
-                img.style.cursor = 'crosshair';
-                img.onclick = function(event) {
-                    handleImageClick(event, img);
-                };
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // 处理图片点击事件，标注文字区域
-        let isDrawing = false;
-        let startX, startY;
-
-        function handleImageClick(event, img) {
-            const rect = img.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            // 计算相对于原始图片的坐标（考虑缩放）
-            const scaleX = img.naturalWidth / img.width;
-            const scaleY = img.naturalHeight / img.height;
-            
-            const actualX = Math.round(x * scaleX);
-            const actualY = Math.round(y * scaleY);
-
-            if (!isDrawing) {
-                // 开始绘制
-                isDrawing = true;
-                startX = actualX;
-                startY = actualY;
-                document.getElementById('coord-display').textContent = `起点: (${startX}, ${startY}) - 继续点击设置终点`;
-            } else {
-                // 结束绘制
-                isDrawing = false;
-                const endX = actualX;
-                const endY = actualY;
-                
-                // 计算矩形区域
-                const x1 = Math.min(startX, endX);
-                const y1 = Math.min(startY, endY);
-                const x2 = Math.max(startX, endX);
-                const y2 = Math.max(startY, endY);
-                
-                const width = x2 - x1;
-                const height = y2 - y1;
-                
-                // 更新表单字段
-                document.getElementById('text-x').value = x1;
-                document.getElementById('text-y').value = y1;
-                document.getElementById('text-width').value = width;
-                document.getElementById('text-height').value = height;
-                
-                document.getElementById('coord-display').innerHTML = `
-                    <strong>文字区域已标注：</strong><br>
-                    X: ${x1}, Y: ${y1}<br>
-                    宽度: ${width}, 高度: ${height}
-                `;
-            }
-        }
-
-        // 提交模板
-        async function submitTemplate() {
-            if (!isLoggedIn) {
-                showMessage('请先登录', 'error');
-                return;
-            }
-
-            const templateName = document.getElementById('template-name').value.trim();
-            const templateFile = document.getElementById('template-file').files[0];
-            const textX = parseInt(document.getElementById('text-x').value) || 0;
-            const textY = parseInt(document.getElementById('text-y').value) || 0;
-            const textWidth = parseInt(document.getElementById('text-width').value) || 0;
-            const textHeight = parseInt(document.getElementById('text-height').value) || 0;
+        // 更新字体大小和颜色预览
+        function updateFontSizePreview() {
             const fontSize = parseInt(document.getElementById('font-size').value) || 37;
             const fontColor = document.getElementById('font-color').value || '#000000';
+            const previewText = document.getElementById('preview-text');
+            previewText.style.fontSize = fontSize + 'px';
+            previewText.style.color = fontColor;
+        }
+
+        // 处理模板图片上传
+          function handleTemplateImageUpload() {
+              if (!isLoggedIn) {
+                  showMessage('请先登录', 'error');
+                  return;
+              }
+
+              const fileInput = document.getElementById('template-file');
+              const file = fileInput.files[0];
+              
+              if (!file) {
+                  showMessage('请选择文件', 'error');
+                  return;
+              }
+
+              // 读取图片并显示预览
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  const img = document.getElementById('template-preview-img');
+                  img.src = e.target.result;
+                  
+                  // 显示预览区域和设置区域
+                  document.getElementById('template-preview-section').style.display = 'block';
+                  document.getElementById('text-area-settings').style.display = 'block';
+                  
+                  // 图片加载完成后初始化Canvas
+                  img.onload = function() {
+                      initTemplateCanvas(img);
+                  };
+                  
+                  // 如果图片已缓存，立即初始化
+                  if (img.complete) {
+                      initTemplateCanvas(img);
+                  }
+              };
+              reader.readAsDataURL(file);
+          }
+
+        // 处理图片点击事件，标注文字区域
+         let isDrawing = false;
+         let startX, startY;
+         let templatePreviewCanvas = null;
+         let templatePreviewCtx = null;
+
+         function handleImageClick(event, img) {
+             // 这个函数已被拖动绘制功能替代
+         }
+
+         // 初始化Canvas用于绘制红色框
+         function initTemplateCanvas(img) {
+             const canvas = document.getElementById('template-preview-canvas');
+             if (!canvas) return;
+             
+             // 获取图片容器的位置信息
+             const imgContainer = img.parentNode;
+             const imgRect = img.getBoundingClientRect();
+             const containerRect = imgContainer.getBoundingClientRect();
+             
+             canvas.width = img.width;
+             canvas.height = img.height;
+             canvas.style.display = 'block';
+             canvas.style.pointerEvents = 'auto';
+             canvas.style.cursor = 'crosshair';
+             canvas.style.left = (imgRect.left - containerRect.left) + 'px';
+             canvas.style.top = (imgRect.top - containerRect.top) + 'px';
+             
+             templatePreviewCanvas = canvas;
+             templatePreviewCtx = canvas.getContext('2d');
+             
+             // 绑定鼠标事件
+             canvas.addEventListener('mousedown', (e) => startDrawing(e, img));
+             canvas.addEventListener('mousemove', (e) => drawRectangle(e, img));
+             canvas.addEventListener('mouseup', (e) => endDrawing(e, img));
+             canvas.addEventListener('mouseleave', (e) => endDrawing(e, img));
+             
+             // 初始化字体大小预览
+             updateFontSizePreview();
+         }
+
+         function startDrawing(event, img) {
+             isDrawing = true;
+             const rect = event.target.getBoundingClientRect();
+             const x = event.clientX - rect.left;
+             const y = event.clientY - rect.top;
+             
+             const scaleX = img.naturalWidth / img.width;
+             const scaleY = img.naturalHeight / img.height;
+             
+             startX = Math.round(x * scaleX);
+             startY = Math.round(y * scaleY);
+         }
+
+         function drawRectangle(event, img) {
+             if (!isDrawing || !templatePreviewCtx) return;
+             
+             const rect = event.target.getBoundingClientRect();
+             const x = event.clientX - rect.left;
+             const y = event.clientY - rect.top;
+             
+             const scaleX = img.naturalWidth / img.width;
+             const scaleY = img.naturalHeight / img.height;
+             
+             const currentX = Math.round(x * scaleX);
+             const currentY = Math.round(y * scaleY);
+             
+             // 清空canvas
+             templatePreviewCtx.clearRect(0, 0, templatePreviewCanvas.width, templatePreviewCanvas.height);
+             
+             // 计算矩形
+             const x1 = Math.min(startX, currentX);
+             const y1 = Math.min(startY, currentY);
+             const x2 = Math.max(startX, currentX);
+             const y2 = Math.max(startY, currentY);
+             
+             const width = x2 - x1;
+             const height = y2 - y1;
+             
+             // 绘制红色框
+             templatePreviewCtx.strokeStyle = '#e63946';
+             templatePreviewCtx.lineWidth = 3;
+             templatePreviewCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
+             templatePreviewCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+             templatePreviewCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+             
+             // 在红色框左上角绘制提示文字
+             if (width > 0 && height > 0) {
+                 const textX = x1 / scaleX + 10;
+                 const textY = y1 / scaleY + 20;
+                 
+                 const fontSize = parseInt(document.getElementById('font-size').value) || 37;
+                 const displayFontSize = Math.max(12, Math.round(fontSize / scaleX));
+                 
+                 templatePreviewCtx.fillStyle = '#e63946';
+                 templatePreviewCtx.font = `bold ${displayFontSize}px Arial`;
+                 templatePreviewCtx.textAlign = 'left';
+                 templatePreviewCtx.textBaseline = 'top';
+                 templatePreviewCtx.fillText('文字区域', textX, textY);
+             }
+             
+             // 显示坐标信息（相对坐标）
+             const displayImgWidth = img.naturalWidth;
+             const displayImgHeight = img.naturalHeight;
+             const relX = (x1 / displayImgWidth).toFixed(4);
+             const relY = (y1 / displayImgHeight).toFixed(4);
+             const relWidth = (width / displayImgWidth).toFixed(4);
+             const relHeight = (height / displayImgHeight).toFixed(4);
+             
+             document.getElementById('coord-display').innerHTML = `
+                 <strong>正在标注（相对位置）：</strong><br>
+                 X: ${relX}, Y: ${relY}<br>
+                 宽度: ${relWidth}, 高度: ${relHeight}
+             `;
+         }
+
+         function endDrawing(event, img) {
+             if (!isDrawing) return;
+             
+             isDrawing = false;
+             
+             const rect = event.target.getBoundingClientRect();
+             const x = event.clientX - rect.left;
+             const y = event.clientY - rect.top;
+             
+             const scaleX = img.naturalWidth / img.width;
+             const scaleY = img.naturalHeight / img.height;
+             
+             const endX = Math.round(x * scaleX);
+             const endY = Math.round(y * scaleY);
+             
+             // 计算矩形区域
+             const x1 = Math.min(startX, endX);
+             const y1 = Math.min(startY, endY);
+             const x2 = Math.max(startX, endX);
+             const y2 = Math.max(startY, endY);
+             
+             const width = x2 - x1;
+             const height = y2 - y1;
+             
+             if (width > 0 && height > 0) {
+                 // 更新表单字段（保存相对位置：相对于图片的百分比）
+                 const imgWidth = img.naturalWidth;
+                 const imgHeight = img.naturalHeight;
+                 
+                 const relativeX = Math.round((x1 / imgWidth) * 10000) / 10000;
+                 const relativeY = Math.round((y1 / imgHeight) * 10000) / 10000;
+                 const relativeWidth = Math.round((width / imgWidth) * 10000) / 10000;
+                 const relativeHeight = Math.round((height / imgHeight) * 10000) / 10000;
+                 
+                 document.getElementById('text-x').value = relativeX;
+                 document.getElementById('text-y').value = relativeY;
+                 document.getElementById('text-width').value = relativeWidth;
+                 document.getElementById('text-height').value = relativeHeight;
+                 
+                 // 重新绘制最终的红色框和提示文字
+                 templatePreviewCtx.clearRect(0, 0, templatePreviewCanvas.width, templatePreviewCanvas.height);
+                 templatePreviewCtx.strokeStyle = '#e63946';
+                 templatePreviewCtx.lineWidth = 3;
+                 templatePreviewCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
+                 templatePreviewCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+                 templatePreviewCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
+                 
+                 // 绘制提示文字在左上角
+                 const textX = x1 / scaleX + 10;
+                 const textY = y1 / scaleY + 20;
+                 
+                 const fontSize = parseInt(document.getElementById('font-size').value) || 37;
+                 const displayFontSize = Math.max(12, Math.round(fontSize / scaleX));
+                 
+                 templatePreviewCtx.fillStyle = '#e63946';
+                 templatePreviewCtx.font = `bold ${displayFontSize}px Arial`;
+                 templatePreviewCtx.textAlign = 'left';
+                 templatePreviewCtx.textBaseline = 'top';
+                 templatePreviewCtx.fillText('文字区域', textX, textY);
+                 
+                 // 显示坐标信息（相对坐标）
+                 const endImgWidth = img.naturalWidth;
+                 const endImgHeight = img.naturalHeight;
+                 const endRelX = (x1 / endImgWidth).toFixed(4);
+                 const endRelY = (y1 / endImgHeight).toFixed(4);
+                 const endRelWidth = (width / endImgWidth).toFixed(4);
+                 const endRelHeight = (height / endImgHeight).toFixed(4);
+                 
+                 document.getElementById('coord-display').innerHTML = `
+                     <strong>文字区域已标注（相对位置）：</strong><br>
+                     X: ${endRelX}, Y: ${endRelY}<br>
+                     宽度: ${endRelWidth}, 高度: ${endRelHeight}
+                 `;
+             }
+         }
+
+        // 提交模板
+         async function submitTemplate() {
+             if (!isLoggedIn) {
+                 showMessage('请先登录', 'error');
+                 return;
+             }
+
+             const templateName = document.getElementById('template-name').value.trim();
+             const templateFile = document.getElementById('template-file').files[0];
+             const textX = parseFloat(document.getElementById('text-x').value) || 0;
+             const textY = parseFloat(document.getElementById('text-y').value) || 0;
+             const textWidth = parseFloat(document.getElementById('text-width').value) || 0;
+             const textHeight = parseFloat(document.getElementById('text-height').value) || 0;
+             const coverColor = document.getElementById('cover-color').value || '#ffffff';
+             const fontSize = parseInt(document.getElementById('font-size').value) || 37;
+             const fontColor = document.getElementById('font-color').value || '#000000';
 
             if (!templateName) {
                 showMessage('请输入模板名称', 'error');
@@ -2565,7 +3045,7 @@
                 return;
             }
 
-            if (textWidth === 0 || textHeight === 0) {
+            if (textWidth <= 0 || textHeight <= 0) {
                 showMessage('请标注文字区域', 'error');
                 return;
             }
@@ -2583,6 +3063,7 @@
                 formData.append('textY', textY);
                 formData.append('textWidth', textWidth);
                 formData.append('textHeight', textHeight);
+                formData.append('coverColor', coverColor);
                 formData.append('fontSize', fontSize);
                 formData.append('fontColor', fontColor);
 
@@ -2625,8 +3106,27 @@
             document.getElementById('text-height').value = '0';
             document.getElementById('font-size').value = '37';
             document.getElementById('font-color').value = '#000000';
-            document.getElementById('coord-display').textContent = '请在图片上点击并拖动来标注文字区域';
+            document.getElementById('coord-display').textContent = '请在图片上拖动鼠标来标注文字区域';
             isDrawing = false;
+            
+            // 清空模板预览图片
+            const previewImg = document.getElementById('template-preview-img');
+            if (previewImg) {
+                previewImg.src = '';
+            }
+            
+            // 清空Canvas
+            const canvas = document.getElementById('template-preview-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                canvas.style.display = 'none';
+            }
+            
+            // 重置字体预览
+            updateFontSizePreview();
         }
 
         // 我的模板分页变量
@@ -2656,13 +3156,15 @@
                     if (templates.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">暂无模板</td></tr>';
                     } else {
-                        tbody.innerHTML = templates.map(template => `
+                        tbody.innerHTML = templates.map(template => {
+                            const templateData = {textX: template.textX, textY: template.textY, textWidth: template.textWidth, textHeight: template.textHeight};
+                            return `
                             <tr>
                                 <td>${template.templateName}</td>
                                 <td>${formatDate(template.createTime)}</td>
                                 <td>${template.status === 1 ? '启用' : '禁用'}</td>
                                 <td>
-                                    <button class="btn btn-primary" onclick="viewTemplateImage('${template.imagePath}', '${template.templateName}')" style="padding: 6px 12px; font-size: 12px; margin: 2px;">
+                                    <button class="btn btn-primary" onclick="viewTemplateImage('${template.imagePath.replace(/'/g, "\\'")}', '${template.templateName.replace(/'/g, "\\'")}', ${JSON.stringify(templateData).replace(/"/g, '"')})" style="padding: 6px 12px; font-size: 12px; margin: 2px;">
                                         <i class="fas fa-eye"></i>查看
                                     </button>
                                     <button class="btn btn-primary" onclick="deleteMyTemplate(${template.id})" style="padding: 6px 12px; font-size: 12px; margin: 2px; background: var(--danger);">
@@ -2670,7 +3172,8 @@
                                     </button>
                                 </td>
                             </tr>
-                        `).join('');
+                        `;
+                        }).join('');
                     }
                     
                     document.getElementById('my-templates-page-info').textContent = `第 ${myTemplatesCurrentPage} 页 / 共 ${myTemplatesTotalPages} 页`;
@@ -2682,9 +3185,15 @@
         }
 
         // 查看模板图片
-        function viewTemplateImage(imagePath, templateName) {
-            openModal(imagePath, templateName);
-        }
+          function viewTemplateImage(imagePath, templateName, templateData) {
+              try {
+                  // templateData 已经是对象，直接使用
+                  openModal(imagePath, templateName, templateData);
+              } catch (error) {
+                  console.error('打开模板失败:', error);
+                  openModal(imagePath, templateName, null);
+              }
+          }
 
         // 删除模板
         async function deleteMyTemplate(templateId) {
@@ -2868,103 +3377,6 @@
                 }
             } catch (error) {
                 console.error('修改密码错误:', error);
-        // 修改密码后执行登出逻辑
-        function performLogoutAfterPasswordChange() {
-            // 清除本地存储
-            localStorage.removeItem('token');
-            localStorage.removeItem('username');
-            localStorage.removeItem('role');
-            isLoggedIn = false;
-            token = null;
-            userRole = null;
-            
-            // 关闭所有模态框
-            const accountModal = document.getElementById('accountModal');
-            if (accountModal) {
-                accountModal.classList.remove('show');
-            }
-            
-            const imageModal = document.getElementById('imageModal');
-            if (imageModal) {
-                imageModal.style.display = 'none';
-            }
-            
-            // 清空模板下拉框
-            document.getElementById('template-select').innerHTML = '<option value="">请选择模板</option>';
-            document.getElementById('batch-template-select').innerHTML = '<option value="">请选择模板</option>';
-            templates = [];
-            
-            // 隐藏模板预览
-            document.getElementById('single-template-preview').style.display = 'none';
-            document.getElementById('batch-template-preview').style.display = 'none';
-            
-            // 清空预览结果
-            document.getElementById('single-preview').innerHTML = '';
-            document.getElementById('batch-preview').innerHTML = '';
-            document.getElementById('single-preview-section').style.display = 'none';
-            document.getElementById('batch-preview-section').style.display = 'none';
-            
-            // 清空预览图片src
-            document.getElementById('single-template-image').src = '';
-            document.getElementById('batch-template-image').src = '';
-            
-            // 清空所有表单输入
-            document.getElementById('single-text').value = '';
-            document.getElementById('batch-text').value = '';
-            document.getElementById('template-name').value = '';
-            document.getElementById('template-file').value = '';
-            document.getElementById('excel-file').value = '';
-            
-            // 清空模板预览表单
-            document.getElementById('template-preview-img').src = '';
-            document.getElementById('template-preview-section').style.display = 'none';
-            document.getElementById('text-area-settings').style.display = 'none';
-            document.getElementById('text-x').value = '0';
-            document.getElementById('text-y').value = '0';
-            document.getElementById('text-width').value = '0';
-            document.getElementById('text-height').value = '0';
-            document.getElementById('font-size').value = '37';
-            document.getElementById('font-color').value = '#000000';
-            document.getElementById('coord-display').textContent = '请在图片上点击并拖动来标注文字区域';
-            
-            // 清空所有表格数据
-            document.getElementById('modal-usage-records').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载中...</td></tr>';
-            document.getElementById('my-templates-tbody').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">加载中...</td></tr>';
-            document.getElementById('admin-users-tbody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载中...</td></tr>';
-            document.getElementById('admin-records-tbody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">加载中...</td></tr>';
-            
-            // 重置分页信息
-            document.getElementById('modal-page-info').textContent = '第 1 页';
-            document.getElementById('my-templates-page-info').textContent = '第 1 页';
-            document.getElementById('admin-users-page-info').textContent = '第 1 页';
-            document.getElementById('admin-records-page-info').textContent = '第 1 页';
-            
-            // 重置统计数据
-            document.getElementById('modal-today-count').textContent = '0';
-            document.getElementById('modal-month-count').textContent = '0';
-            document.getElementById('modal-total-count').textContent = '0';
-            document.getElementById('admin-user-count').textContent = '0';
-            document.getElementById('admin-total-generate').textContent = '0';
-            document.getElementById('admin-today-generate').textContent = '0';
-            
-            // 重置标签页状态
-            currentPage = 1;
-            totalPages = 1;
-            modalCurrentPage = 1;
-            modalTotalPages = 1;
-            adminCurrentPage = 1;
-            adminTotalPages = 1;
-            myTemplatesCurrentPage = 1;
-            myTemplatesTotalPages = 1;
-            currentImages = [];
-            isDrawing = false;
-            
-            // 更新UI为未登录状态
-            initPage();
-            
-            // 显示提示信息
-            showMessage('密码已修改，请使用新密码重新登录', 'success');
-        }
                 showChangePasswordMessage('修改密码失败：' + error.message, 'error');
             } finally {
                 btn.innerHTML = originalText;

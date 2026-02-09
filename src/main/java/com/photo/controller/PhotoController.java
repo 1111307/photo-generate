@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -55,19 +56,24 @@ public class PhotoController {
     @PostMapping("/create-template")
     public Result<PhotoTemplate> createTemplate(@RequestParam("file") MultipartFile file,
                                                 @RequestParam("templateName") String templateName,
-                                                @RequestParam(value = "textX", defaultValue = "0") Integer textX,
-                                                @RequestParam(value = "textY", defaultValue = "0") Integer textY,
-                                                @RequestParam(value = "textWidth", defaultValue = "0") Integer textWidth,
-                                                @RequestParam(value = "textHeight", defaultValue = "0") Integer textHeight,
+                                                @RequestParam(value = "textX", defaultValue = "0") Double textX,
+                                                @RequestParam(value = "textY", defaultValue = "0") Double textY,
+                                                @RequestParam(value = "textWidth", defaultValue = "0") Double textWidth,
+                                                @RequestParam(value = "textHeight", defaultValue = "0") Double textHeight,
+                                                @RequestParam(value = "coverColor", defaultValue = "#ffffff") String coverColor,
                                                 @RequestParam(value = "fontSize", defaultValue = "37") Integer fontSize,
                                                 @RequestParam(value = "fontColor", defaultValue = "#000000") String fontColor) {
         try {
+            String userId = UserContext.getUserId();
+            
             PhotoTemplate template = new PhotoTemplate();
+            template.setUserId(userId);
             template.setTemplateName(templateName);
-            template.setTextX(textX);
-            template.setTextY(textY);
-            template.setTextWidth(textWidth);
-            template.setTextHeight(textHeight);
+            template.setTextX(textX != null ? BigDecimal.valueOf(textX) : BigDecimal.ZERO);
+            template.setTextY(textY != null ? BigDecimal.valueOf(textY) : BigDecimal.ZERO);
+            template.setTextWidth(textWidth != null ? BigDecimal.valueOf(textWidth) : BigDecimal.ZERO);
+            template.setTextHeight(textHeight != null ? BigDecimal.valueOf(textHeight) : BigDecimal.ZERO);
+            template.setCoverColor(coverColor);
             template.setFontSize(fontSize);
             template.setFontColor(fontColor);
             template.setStatus(1); // 默认启用

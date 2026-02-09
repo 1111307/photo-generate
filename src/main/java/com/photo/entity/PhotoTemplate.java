@@ -3,6 +3,7 @@ package com.photo.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 /**
  * 图片模板实体类
@@ -30,24 +31,29 @@ public class PhotoTemplate {
     private String imagePath;
 
     /**
-     * 文字区域X坐标
+     * 文字区域X坐标（相对坐标：0-1之间的比例）
      */
-    private Integer textX;
+    private BigDecimal textX;
 
     /**
-     * 文字区域Y坐标
+     * 文字区域Y坐标（相对坐标：0-1之间的比例）
      */
-    private Integer textY;
+    private BigDecimal textY;
 
     /**
-     * 文字区域宽度
+     * 文字区域宽度（相对坐标：0-1之间的比例）
      */
-    private Integer textWidth;
+    private BigDecimal textWidth;
 
     /**
-     * 文字区域高度
+     * 文字区域高度（相对坐标：0-1之间的比例）
      */
-    private Integer textHeight;
+    private BigDecimal textHeight;
+
+    /**
+     * 覆盖颜色（十六进制）
+     */
+    private String coverColor;
 
     /**
      * 字体大小

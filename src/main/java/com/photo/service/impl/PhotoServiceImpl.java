@@ -23,6 +23,7 @@ import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,9 +98,29 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-            // 清除原有文字区域（用白色填充）
-            g2d.setColor(Color.WHITE);
-            g2d.fillRect(template.getTextX(), template.getTextY(), template.getTextWidth(), template.getTextHeight());
+            // 将相对坐标转换为绝对坐标
+            int imgWidth = image.getWidth();
+            int imgHeight = image.getHeight();
+            
+            // 处理 BigDecimal 类型的坐标
+            BigDecimal textXBD = template.getTextX() != null ? template.getTextX() : BigDecimal.ZERO;
+            BigDecimal textYBD = template.getTextY() != null ? template.getTextY() : BigDecimal.ZERO;
+            BigDecimal textWidthBD = template.getTextWidth() != null ? template.getTextWidth() : BigDecimal.ZERO;
+            BigDecimal textHeightBD = template.getTextHeight() != null ? template.getTextHeight() : BigDecimal.ZERO;
+            
+            int textX = (int) Math.round(textXBD.doubleValue() * imgWidth);
+            int textY = (int) Math.round(textYBD.doubleValue() * imgHeight);
+            int textWidth = (int) Math.round(textWidthBD.doubleValue() * imgWidth);
+            int textHeight = (int) Math.round(textHeightBD.doubleValue() * imgHeight);
+
+            // 清除原有文字区域（用指定的覆盖颜色填充）
+            String coverColor = template.getCoverColor() != null ? template.getCoverColor() : "#ffffff";
+            try {
+                g2d.setColor(Color.decode(coverColor));
+            } catch (NumberFormatException e) {
+                g2d.setColor(Color.WHITE);
+            }
+            g2d.fillRect(textX, textY, textWidth, textHeight);
 
             // 设置字体
             Font font = new Font("微软雅黑", Font.PLAIN, template.getFontSize());
@@ -114,7 +135,7 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             int ascent = fm.getAscent();
             
             // 计算每行最大宽度（留出一些边距）
-            int maxWidth = template.getTextWidth() - 20;
+            int maxWidth = textWidth - 20;
             
             // 分割文字为多行
             List<String> lines = new ArrayList<>();
@@ -149,12 +170,11 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
                 }
             }
             
-            // 计算起始Y坐标（垂直居中）
-            int totalHeight = lines.size() * lineHeight;
-            int startY = template.getTextY() + (template.getTextHeight() - totalHeight) / 2 + ascent;
+            // 计算起始Y坐标（从左上角开始）
+            int startY = textY + ascent + 10; // 上边距10像素
             
             // 绘制每一行文字（左对齐）
-            int x = template.getTextX() + 30; // 左边距30像素
+            int x = textX + 10; // 左边距10像素
             for (int i = 0; i < lines.size(); i++) {
                 int y = startY + i * lineHeight;
                 g2d.drawString(lines.get(i), x, y);
