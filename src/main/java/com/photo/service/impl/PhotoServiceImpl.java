@@ -133,9 +133,9 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
             FontMetrics fm = g2d.getFontMetrics();
             int lineHeight = fm.getHeight();
             int ascent = fm.getAscent();
-            
-            // 计算每行最大宽度（留出一些边距）
-            int maxWidth = textWidth - 20;
+             
+            // 计算每行最大宽度（紧贴左上角，无边距）
+            int maxWidth = textWidth;
             
             // 分割文字为多行
             List<String> lines = new ArrayList<>();
@@ -170,11 +170,11 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoTemplateMapper, PhotoTemp
                 }
             }
             
-            // 计算起始Y坐标（从左上角开始）
-            int startY = textY + ascent + 10; // 上边距10像素
+            // 计算起始Y坐标（从左上角开始，紧贴左上角）
+            int startY = textY + ascent;
             
-            // 绘制每一行文字（左对齐）
-            int x = textX + 10; // 左边距10像素
+            // 绘制每一行文字（左对齐，紧贴左上角）
+            int x = textX;
             for (int i = 0; i < lines.size(); i++) {
                 int y = startY + i * lineHeight;
                 g2d.drawString(lines.get(i), x, y);

@@ -1121,6 +1121,9 @@
                             <button class="btn btn-primary" onclick="submitTemplate()">
                                 <i class="fas fa-save"></i>保存模板
                             </button>
+                            <button class="btn btn-outline" onclick="resetTemplateForm()">
+                                <i class="fas fa-redo"></i>重置表单
+                            </button>
                         </div>
 
                         <!-- 我的模板列表 -->
@@ -1692,24 +1695,18 @@
                  
                  const overlayCtx = overlayCanvas.getContext('2d');
                  
-                 // 计算缩放比例（显示宽高 / 自然宽高）
-                 const scaleX = img.naturalWidth / imageRect.width;
-                 const scaleY = img.naturalHeight / imageRect.height;
+                 // template中的坐标是相对坐标（0-1之间的比例），直接转换为显示坐标
+                 const x1 = (template.textX || 0) * imageRect.width;
+                 const y1 = (template.textY || 0) * imageRect.height;
+                 const width = (template.textWidth || 0) * imageRect.width;
+                 const height = (template.textHeight || 0) * imageRect.height;
                  
-                 // template中的坐标是相对坐标（0-1之间的比例），需要转换为自然宽高的绝对坐标
-                 const x1 = (template.textX || 0) * img.naturalWidth;
-                 const y1 = (template.textY || 0) * img.naturalHeight;
-                 const width = (template.textWidth || 0) * img.naturalWidth;
-                 const height = (template.textHeight || 0) * img.naturalHeight;
-                 
-                 // 绘制红色框（转换为显示坐标）
+                 // 绘制红色框（直接使用显示坐标）
                  overlayCtx.strokeStyle = '#e63946';
                  overlayCtx.lineWidth = 3;
                  overlayCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
-                 overlayCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
-                 overlayCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
-                 
-                 // 不在预览中显示文字标签
+                 overlayCtx.fillRect(x1, y1, width, height);
+                 overlayCtx.strokeRect(x1, y1, width, height);
              }, 100);
          }
 
@@ -2522,8 +2519,6 @@
             // 等待图片加载完成
             setTimeout(() => {
                 const imageRect = img.getBoundingClientRect();
-                const scaleX = img.naturalWidth / imageRect.width;
-                const scaleY = img.naturalHeight / imageRect.height;
                 
                 overlayCanvas.width = imageRect.width;
                 overlayCanvas.height = imageRect.height;
@@ -2531,32 +2526,19 @@
                 overlayCanvas.style.top = imageRect.top + 'px';
                 
                 const overlayCtx = overlayCanvas.getContext('2d');
-                const x = templateData.textX || 0;
-                const y = templateData.textY || 0;
-                const width = templateData.textWidth || 0;
-                const height = templateData.textHeight || 0;
                 
-                // 绘制红色框
+                // templateData中的坐标是相对坐标（0-1之间的比例），直接转换为显示坐标
+                const x1 = (templateData.textX || 0) * imageRect.width;
+                const y1 = (templateData.textY || 0) * imageRect.height;
+                const width = (templateData.textWidth || 0) * imageRect.width;
+                const height = (templateData.textHeight || 0) * imageRect.height;
+                
+                // 绘制红色框（直接使用显示坐标）
                 overlayCtx.strokeStyle = '#e63946';
                 overlayCtx.lineWidth = 3;
                 overlayCtx.fillStyle = 'rgba(230, 57, 70, 0.1)';
-                overlayCtx.fillRect(x / scaleX, y / scaleY, width / scaleX, height / scaleY);
-                overlayCtx.strokeRect(x / scaleX, y / scaleY, width / scaleX, height / scaleY);
-                
-                // 在红色框内绘制提示文字
-                if (width > 0 && height > 0) {
-                    const centerX = (x + width / 2) / scaleX;
-                    const centerY = (y + height / 2) / scaleY;
-                    
-                    // 获取表单中的字体大小
-                    const fontSize = parseInt(document.getElementById('font-size').value) || 37;
-                    
-                    overlayCtx.fillStyle = '#e63946';
-                    overlayCtx.font = `bold ${fontSize}px Arial`;
-                    overlayCtx.textAlign = 'center';
-                    overlayCtx.textBaseline = 'middle';
-                    overlayCtx.fillText('文字区域', centerX, centerY);
-                }
+                overlayCtx.fillRect(x1, y1, width, height);
+                overlayCtx.strokeRect(x1, y1, width, height);
             }, 100);
         }
 
@@ -2912,10 +2894,10 @@
              templatePreviewCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
              templatePreviewCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
              
-             // 在红色框左上角绘制提示文字
+             // 在红色框左上角绘制提示文字（紧贴左上角）
              if (width > 0 && height > 0) {
-                 const textX = x1 / scaleX + 10;
-                 const textY = y1 / scaleY + 20;
+                 const textX = x1 / scaleX;
+                 const textY = y1 / scaleY;
                  
                  const fontSize = parseInt(document.getElementById('font-size').value) || 37;
                  const displayFontSize = Math.max(12, Math.round(fontSize / scaleX));
@@ -2989,9 +2971,9 @@
                  templatePreviewCtx.fillRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
                  templatePreviewCtx.strokeRect(x1 / scaleX, y1 / scaleY, width / scaleX, height / scaleY);
                  
-                 // 绘制提示文字在左上角
-                 const textX = x1 / scaleX + 10;
-                 const textY = y1 / scaleY + 20;
+                 // 绘制提示文字在左上角（紧贴左上角）
+                 const textX = x1 / scaleX;
+                 const textY = y1 / scaleY;
                  
                  const fontSize = parseInt(document.getElementById('font-size').value) || 37;
                  const displayFontSize = Math.max(12, Math.round(fontSize / scaleX));
@@ -3157,14 +3139,14 @@
                         tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">暂无模板</td></tr>';
                     } else {
                         tbody.innerHTML = templates.map(template => {
-                            const templateData = {textX: template.textX, textY: template.textY, textWidth: template.textWidth, textHeight: template.textHeight};
+                            const templateDataJson = encodeURIComponent(JSON.stringify({textX: template.textX, textY: template.textY, textWidth: template.textWidth, textHeight: template.textHeight, fontSize: template.fontSize}));
                             return `
                             <tr>
                                 <td>${template.templateName}</td>
                                 <td>${formatDate(template.createTime)}</td>
                                 <td>${template.status === 1 ? '启用' : '禁用'}</td>
                                 <td>
-                                    <button class="btn btn-primary" onclick="viewTemplateImage('${template.imagePath.replace(/'/g, "\\'")}', '${template.templateName.replace(/'/g, "\\'")}', ${JSON.stringify(templateData).replace(/"/g, '"')})" style="padding: 6px 12px; font-size: 12px; margin: 2px;">
+                                    <button class="btn btn-primary" data-image-path="${template.imagePath}" data-template-name="${template.templateName}" data-template-data="${templateDataJson}" onclick="viewTemplateImageFromButton(this)" style="padding: 6px 12px; font-size: 12px; margin: 2px;">
                                         <i class="fas fa-eye"></i>查看
                                     </button>
                                     <button class="btn btn-primary" onclick="deleteMyTemplate(${template.id})" style="padding: 6px 12px; font-size: 12px; margin: 2px; background: var(--danger);">
@@ -3194,6 +3176,27 @@
                   openModal(imagePath, templateName, null);
               }
           }
+
+        // 从按钮查看模板图片（使用data属性）
+        function viewTemplateImageFromButton(button) {
+            try {
+                const imagePath = button.getAttribute('data-image-path');
+                const templateName = button.getAttribute('data-template-name');
+                const templateDataStr = button.getAttribute('data-template-data');
+                
+                let templateData = null;
+                if (templateDataStr) {
+                    templateData = JSON.parse(decodeURIComponent(templateDataStr));
+                }
+                
+                openModal(imagePath, templateName, templateData);
+            } catch (error) {
+                console.error('打开模板失败:', error);
+                const imagePath = button.getAttribute('data-image-path');
+                const templateName = button.getAttribute('data-template-name');
+                openModal(imagePath, templateName, null);
+            }
+        }
 
         // 删除模板
         async function deleteMyTemplate(templateId) {
