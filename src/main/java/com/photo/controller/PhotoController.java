@@ -19,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -287,11 +290,34 @@ public class PhotoController {
                return Result.error("无权删除他人的模板");
            }
            
+           // 删除模板图片文件
+           try {
+               deleteTemplateImageFile(template.getImagePath());
+           } catch (IOException e) {
+               return Result.error("删除模板图片失败: " + e.getMessage());
+           }
+
            // 删除模板
            photoService.removeById(id);
            return Result.success("删除成功");
        } catch (Exception e) {
            return Result.error("删除失败：" + e.getMessage());
        }
+   }
+
+   private void deleteTemplateImageFile(String imagePath) throws IOException {
+       if (imagePath == null || imagePath.trim().isEmpty()) {
+           return;
+       }
+       String normalized = imagePath.trim();
+       if (normalized.startsWith("/")) {
+           normalized = normalized.substring(1);
+       }
+       Path path = Paths.get(normalized);
+       if (!path.isAbsolute()) {
+           String projectRoot = System.getProperty("user.dir");
+           path = Paths.get(projectRoot).resolve(normalized);
+       }
+       Files.deleteIfExists(path);
    }
 }

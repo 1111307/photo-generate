@@ -15,7 +15,7 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://localhost:3306/photo_generate?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       username: root
-      password: Root@123456
+      password: 123456
       initial-size: 5
       min-idle: 5
       max-active: 20

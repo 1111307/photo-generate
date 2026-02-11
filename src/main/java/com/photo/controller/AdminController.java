@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -199,6 +203,18 @@ public class AdminController {
                 return Result.error("无权限访问");
             }
 
+            PhotoTemplate template = photoService.getById(id);
+            if (template == null) {
+                return Result.error("模板不存在");
+            }
+
+            // 删除模板图片文件
+            try {
+                deleteTemplateImageFile(template.getImagePath());
+            } catch (IOException e) {
+                return Result.error("删除模板图片失败: " + e.getMessage());
+            }
+
             boolean success = photoService.removeById(id);
             if (success) {
                 return Result.success("删除成功");
@@ -208,5 +224,21 @@ public class AdminController {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    private void deleteTemplateImageFile(String imagePath) throws IOException {
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            return;
+        }
+        String normalized = imagePath.trim();
+        if (normalized.startsWith("/")) {
+            normalized = normalized.substring(1);
+        }
+        Path path = Paths.get(normalized);
+        if (!path.isAbsolute()) {
+            String projectRoot = System.getProperty("user.dir");
+            path = Paths.get(projectRoot).resolve(normalized);
+        }
+        Files.deleteIfExists(path);
     }
 }

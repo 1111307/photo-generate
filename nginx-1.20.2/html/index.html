@@ -949,8 +949,8 @@
                                 <i class="fas fa-eye"></i>模板预览
                             </label>
                             <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px; position: relative; overflow: auto; max-height: 600px;">
-                                <div style="position: relative; display: inline-block;">
-                                    <img id="single-template-image" src="" alt="模板预览" style="max-width: 25%; border-radius: var(--border-radius-sm); display: block;">
+                                <div style="position: relative; display: inline-block; max-width: 90%;">
+                                    <img id="single-template-image" src="" alt="模板预览" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: var(--border-radius-sm); display: block; margin: 0 auto;">
                                     <canvas id="single-template-canvas" style="position: absolute; top: 0; left: 0; cursor: crosshair;"></canvas>
                                 </div>
                             </div>
@@ -991,8 +991,8 @@
                                 <i class="fas fa-eye"></i>模板预览
                             </label>
                             <div style="text-align: center; border: 2px dashed var(--gray-300); border-radius: var(--border-radius); padding: 20px; position: relative; overflow: auto; max-height: 600px;">
-                                <div style="position: relative; display: inline-block;">
-                                    <img id="batch-template-image" src="" alt="模板预览" style="max-width: 25%; border-radius: var(--border-radius-sm); display: block;">
+                                <div style="position: relative; display: inline-block; max-width: 90%;">
+                                    <img id="batch-template-image" src="" alt="模板预览" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: var(--border-radius-sm); display: block; margin: 0 auto;">
                                     <canvas id="batch-template-canvas" style="position: absolute; top: 0; left: 0; cursor: crosshair;"></canvas>
                                 </div>
                             </div>
@@ -1104,7 +1104,7 @@
                                 </div>
                                 <div>
                                     <label class="form-label" style="font-size: 13px;">覆盖颜色</label>
-                                    <input type="color" class="form-control" id="cover-color" value="#ffffff" style="height: 45px; cursor: pointer;">
+                                    <input type="color" class="form-control" id="cover-color" value="#ffffff" style="height: 45px; cursor: pointer;" onchange="updateFontSizePreview()" oninput="updateFontSizePreview()">
                                 </div>
                                 <div>
                                     <label class="form-label" style="font-size: 13px;">字体大小</label>
@@ -1639,16 +1639,8 @@
                 // 直接使用相对路径
                 image.src = template.imagePath;
                 // 添加点击事件，使图片可以被打开查看
-                image.style.cursor = 'pointer';
-                image.onclick = function() {
-                    openModal(template.imagePath, template.templateName, {
-                        textX: template.textX,
-                        textY: template.textY,
-                        textWidth: template.textWidth,
-                        textHeight: template.textHeight,
-                        fontSize: template.fontSize
-                    });
-                };
+                image.style.cursor = 'default';
+                image.onclick = null;
                 previewDiv.style.display = 'block';
                 
                 // 如果模板有坐标信息，在预览图片上绘制红色框
@@ -1686,20 +1678,23 @@
              
              // 等待图片加载完成
              setTimeout(() => {
-                 const imageRect = img.getBoundingClientRect();
+                 const displayWidth = img.offsetWidth;
+                 const displayHeight = img.offsetHeight;
                  
-                 overlayCanvas.width = imageRect.width;
-                 overlayCanvas.height = imageRect.height;
-                 overlayCanvas.style.left = '0';
-                 overlayCanvas.style.top = '0';
+                 overlayCanvas.width = displayWidth;
+                 overlayCanvas.height = displayHeight;
+                 overlayCanvas.style.left = img.offsetLeft + 'px';
+                 overlayCanvas.style.top = img.offsetTop + 'px';
+                 overlayCanvas.style.width = displayWidth + 'px';
+                 overlayCanvas.style.height = displayHeight + 'px';
                  
                  const overlayCtx = overlayCanvas.getContext('2d');
                  
                  // template中的坐标是相对坐标（0-1之间的比例），直接转换为显示坐标
-                 const x1 = (template.textX || 0) * imageRect.width;
-                 const y1 = (template.textY || 0) * imageRect.height;
-                 const width = (template.textWidth || 0) * imageRect.width;
-                 const height = (template.textHeight || 0) * imageRect.height;
+                 const x1 = (template.textX || 0) * displayWidth;
+                 const y1 = (template.textY || 0) * displayHeight;
+                 const width = (template.textWidth || 0) * displayWidth;
+                 const height = (template.textHeight || 0) * displayHeight;
                  
                  // 绘制红色框（直接使用显示坐标）
                  overlayCtx.strokeStyle = '#e63946';
@@ -2520,10 +2515,13 @@
             setTimeout(() => {
                 const imageRect = img.getBoundingClientRect();
                 
+                const modalRect = document.getElementById('imageModal').getBoundingClientRect();
                 overlayCanvas.width = imageRect.width;
                 overlayCanvas.height = imageRect.height;
-                overlayCanvas.style.left = imageRect.left + 'px';
-                overlayCanvas.style.top = imageRect.top + 'px';
+                overlayCanvas.style.left = (imageRect.left - modalRect.left) + 'px';
+                overlayCanvas.style.top = (imageRect.top - modalRect.top) + 'px';
+                overlayCanvas.style.width = imageRect.width + 'px';
+                overlayCanvas.style.height = imageRect.height + 'px';
                 
                 const overlayCtx = overlayCanvas.getContext('2d');
                 
@@ -2566,10 +2564,13 @@
             // 等待图片加载完成
             setTimeout(() => {
                 const imageRect = img.getBoundingClientRect();
+                const modalRect = document.getElementById('imageModal').getBoundingClientRect();
                 overlayCanvas.width = imageRect.width;
                 overlayCanvas.height = imageRect.height;
-                overlayCanvas.style.left = imageRect.left + 'px';
-                overlayCanvas.style.top = imageRect.top + 'px';
+                overlayCanvas.style.left = (imageRect.left - modalRect.left) + 'px';
+                overlayCanvas.style.top = (imageRect.top - modalRect.top) + 'px';
+                overlayCanvas.style.width = imageRect.width + 'px';
+                overlayCanvas.style.height = imageRect.height + 'px';
                 
                 modalOverlayCanvas = overlayCanvas;
                 modalOverlayCtx = overlayCanvas.getContext('2d');
@@ -2768,6 +2769,67 @@
             const previewText = document.getElementById('preview-text');
             previewText.style.fontSize = fontSize + 'px';
             previewText.style.color = fontColor;
+            renderTemplateOverlay();
+        }
+
+        function renderTemplateOverlay() {
+            if (!templatePreviewCanvas || !templatePreviewCtx) return;
+            const img = document.getElementById('template-preview-img');
+            if (!img || !img.naturalWidth || !img.naturalHeight) return;
+
+            const relX = parseFloat(document.getElementById('text-x').value) || 0;
+            const relY = parseFloat(document.getElementById('text-y').value) || 0;
+            const relW = parseFloat(document.getElementById('text-width').value) || 0;
+            const relH = parseFloat(document.getElementById('text-height').value) || 0;
+
+            templatePreviewCtx.clearRect(0, 0, templatePreviewCanvas.width, templatePreviewCanvas.height);
+
+            if (relW <= 0 || relH <= 0) {
+                return;
+            }
+
+            const x1 = relX * img.naturalWidth;
+            const y1 = relY * img.naturalHeight;
+            const width = relW * img.naturalWidth;
+            const height = relH * img.naturalHeight;
+
+            drawTemplateOverlay(img, x1, y1, width, height);
+        }
+
+        function drawTemplateOverlay(img, x1, y1, width, height) {
+            if (!templatePreviewCtx || !templatePreviewCanvas) return;
+
+            const scaleX = img.naturalWidth / img.width;
+            const scaleY = img.naturalHeight / img.height;
+
+            const displayX = x1 / scaleX;
+            const displayY = y1 / scaleY;
+            const displayW = width / scaleX;
+            const displayH = height / scaleY;
+
+            const coverColor = document.getElementById('cover-color').value || '#ffffff';
+            const fontSize = parseInt(document.getElementById('font-size').value) || 37;
+            const fontColor = document.getElementById('font-color').value || '#000000';
+
+            templatePreviewCtx.clearRect(0, 0, templatePreviewCanvas.width, templatePreviewCanvas.height);
+
+            templatePreviewCtx.strokeStyle = '#e63946';
+            templatePreviewCtx.lineWidth = 3;
+
+            templatePreviewCtx.save();
+            templatePreviewCtx.globalAlpha = 0.35;
+            templatePreviewCtx.fillStyle = coverColor;
+            templatePreviewCtx.fillRect(displayX, displayY, displayW, displayH);
+            templatePreviewCtx.restore();
+
+            templatePreviewCtx.strokeRect(displayX, displayY, displayW, displayH);
+
+            const displayFontSize = Math.max(12, Math.round(fontSize / scaleX));
+            templatePreviewCtx.fillStyle = fontColor;
+            templatePreviewCtx.font = `bold ${displayFontSize}px Arial`;
+            templatePreviewCtx.textAlign = 'left';
+            templatePreviewCtx.textBaseline = 'top';
+            templatePreviewCtx.fillText('文字区域', displayX + 4, displayY + 4);
         }
 
         // 处理模板图片上传
@@ -3064,6 +3126,7 @@
                     resetTemplateForm();
                     // 重新加载模板列表
                     loadTemplates();
+                    loadMyTemplates(1);
                 } else {
                     showMessage(result.message || '创建模板失败', 'error');
                 }
