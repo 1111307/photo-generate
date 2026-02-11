@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -259,6 +259,32 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .swatch-list {
+            display: grid;
+            grid-template-columns: repeat(5, 26px);
+            gap: 6px;
+        }
+
+        .swatch {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
         }
 
         textarea.form-control {
@@ -1077,7 +1103,7 @@
                             </div>
                             <div id="template-coordinates-info" style="margin-top: 15px; padding: 15px; background: var(--gray-100); border-radius: var(--border-radius-sm); text-align: left; font-size: 13px; color: var(--gray-700);">
                                 <p><strong>在图片上拖动鼠标标注文字区域：</strong></p>
-                                <p id="coord-display">请在图片上拖动鼠标来标注文字区域</p>
+                                <p id="coord-display">请在图片上拖动鼠标来标注文字区域（无需手动填写坐标/高度）</p>
                             </div>
                         </div>
 
@@ -1086,19 +1112,19 @@
                                 <i class="fas fa-sliders-h"></i>文字区域设置
                             </label>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div>
+                                <div style="display: none;">
                                     <label class="form-label" style="font-size: 13px;">X坐标</label>
                                     <input type="number" class="form-control" id="text-x" value="0" min="0">
                                 </div>
-                                <div>
+                                <div style="display: none;">
                                     <label class="form-label" style="font-size: 13px;">Y坐标</label>
                                     <input type="number" class="form-control" id="text-y" value="0" min="0">
                                 </div>
-                                <div>
+                                <div style="display: none;">
                                     <label class="form-label" style="font-size: 13px;">宽度</label>
                                     <input type="number" class="form-control" id="text-width" value="0" min="0">
                                 </div>
-                                <div>
+                                <div style="display: none;">
                                     <label class="form-label" style="font-size: 13px;">高度</label>
                                     <input type="number" class="form-control" id="text-height" value="0" min="0">
                                 </div>
@@ -1113,6 +1139,47 @@
                                 <div>
                                     <label class="form-label" style="font-size: 13px;">字体颜色</label>
                                     <input type="color" class="form-control" id="font-color" value="#000000" style="height: 45px; cursor: pointer;" onchange="updateFontSizePreview()" oninput="updateFontSizePreview()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="text-style-quick" style="display: none; margin-top: 5px;">
+	                            <label class="form-label" style="font-size: 13px;">
+	                                <i class="fas fa-magic"></i> 字体 / 颜色快捷修改
+	                            </label>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                                <div>
+	                                    <div style="display:flex; align-items:center; justify-content: space-between; margin-bottom:6px; color: var(--gray-700); font-size:13px;">
+	                                        <span>字体大小</span>
+	                                        <span id="font-size-label" style="font-weight:600;">37px</span>
+	                                    </div>
+                                    <input type="range" id="font-size-slider" min="14" max="96" step="1" value="37" style="width:100%;" oninput="syncFontSizeFromSlider(this.value)">
+                                </div>
+	                                <div>
+	                                    <div style="color: var(--gray-700); font-size:13px; margin-bottom:6px;">字体颜色</div>
+	                                    <div class="color-picker-row" style="gap:12px;">
+                                        <input type="color" id="font-color-picker" value="#000000" style="height:45px; cursor:pointer;" oninput="syncFontColor(this.value)">
+                                        <div class="swatch-list" data-target="font-color" style="grid-template-columns: repeat(5, 24px);">
+                                            <div class="swatch" style="background:#111827" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#f97316" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#e63946" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#10b981" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#2563eb" onclick="applySwatch(this)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+	                                <div>
+	                                    <div style="color: var(--gray-700); font-size:13px; margin-bottom:6px;">覆盖颜色</div>
+	                                    <div class="color-picker-row" style="gap:12px;">
+                                        <input type="color" id="cover-color-picker" value="#ffffff" style="height:45px; cursor:pointer;" oninput="syncCoverColor(this.value)">
+                                        <div class="swatch-list" data-target="cover-color" style="grid-template-columns: repeat(5, 24px);">
+                                            <div class="swatch" style="background:#ffffff" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#f5f7fa" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#ffe8cc" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#e9f5ff" onclick="applySwatch(this)"></div>
+                                            <div class="swatch" style="background:#111827" onclick="applySwatch(this)"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1530,6 +1597,8 @@
             document.getElementById('template-preview-img').src = '';
             document.getElementById('template-preview-section').style.display = 'none';
             document.getElementById('text-area-settings').style.display = 'none';
+            const quickPanel = document.getElementById('text-style-quick');
+            if (quickPanel) quickPanel.style.display = 'none';
             document.getElementById('text-x').value = '0';
             document.getElementById('text-y').value = '0';
             document.getElementById('text-width').value = '0';
@@ -2072,6 +2141,8 @@
                 document.getElementById('template-preview-img').src = '';
                 document.getElementById('template-preview-section').style.display = 'none';
                 document.getElementById('text-area-settings').style.display = 'none';
+                const quick = document.getElementById('text-style-quick');
+                if (quick) quick.style.display = 'none';
                 document.getElementById('text-x').value = '0';
                 document.getElementById('text-y').value = '0';
                 document.getElementById('text-width').value = '0';
@@ -2764,12 +2835,68 @@
 
         // 更新字体大小和颜色预览
         function updateFontSizePreview() {
-            const fontSize = parseInt(document.getElementById('font-size').value) || 37;
-            const fontColor = document.getElementById('font-color').value || '#000000';
+            const sizeInput = document.getElementById('font-size');
+            const slider = document.getElementById('font-size-slider');
+            const fontSize = parseInt((slider && slider.value) || (sizeInput && sizeInput.value) || 37);
+
+            if (sizeInput && sizeInput.value != fontSize) sizeInput.value = fontSize;
+            if (slider && slider.value != fontSize) slider.value = fontSize;
+            const sizeLabel = document.getElementById('font-size-label');
+            if (sizeLabel) sizeLabel.textContent = fontSize + 'px';
+
+            const fontColorInput = document.getElementById('font-color');
+            const fontColorPicker = document.getElementById('font-color-picker');
+            const fontColor = (fontColorPicker && fontColorPicker.value) || (fontColorInput && fontColorInput.value) || '#000000';
+            if (fontColorInput && fontColorInput.value !== fontColor) fontColorInput.value = fontColor;
+            if (fontColorPicker && fontColorPicker.value !== fontColor) fontColorPicker.value = fontColor;
+
             const previewText = document.getElementById('preview-text');
             previewText.style.fontSize = fontSize + 'px';
             previewText.style.color = fontColor;
             renderTemplateOverlay();
+        }
+
+        function syncFontSizeFromSlider(val) {
+            const sizeInput = document.getElementById('font-size');
+            if (sizeInput) sizeInput.value = val;
+            updateFontSizePreview();
+        }
+
+        function syncFontColor(val) {
+            const fontColorInput = document.getElementById('font-color');
+            const fontColorPicker = document.getElementById('font-color-picker');
+            if (fontColorInput) fontColorInput.value = val;
+            if (fontColorPicker) fontColorPicker.value = val;
+            updateFontSizePreview();
+        }
+
+        function syncCoverColor(val) {
+            const coverInput = document.getElementById('cover-color');
+            const coverPicker = document.getElementById('cover-color-picker');
+            if (coverInput) coverInput.value = val;
+            if (coverPicker) coverPicker.value = val;
+            updateFontSizePreview();
+        }
+
+        function applySwatch(el) {
+            const parent = el.closest('.swatch-list');
+            if (!parent) return;
+            const target = parent.getAttribute('data-target');
+            const color = rgbToHex(getComputedStyle(el).backgroundColor);
+            if (target === 'font-color') {
+                syncFontColor(color);
+            } else if (target === 'cover-color') {
+                syncCoverColor(color);
+            }
+        }
+
+        function rgbToHex(rgb) {
+            const res = rgb.match(/\d+/g);
+            if (!res) return '#000000';
+            return '#' + res.slice(0, 3).map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
         }
 
         function renderTemplateOverlay() {
@@ -2856,6 +2983,8 @@
                   // 显示预览区域和设置区域
                   document.getElementById('template-preview-section').style.display = 'block';
                   document.getElementById('text-area-settings').style.display = 'block';
+                  const quick = document.getElementById('text-style-quick');
+                  if (quick) quick.style.display = 'block';
                   
                   // 图片加载完成后初始化Canvas
                   img.onload = function() {
@@ -2971,19 +3100,8 @@
                  templatePreviewCtx.fillText('文字区域', textX, textY);
              }
              
-             // 显示坐标信息（相对坐标）
-             const displayImgWidth = img.naturalWidth;
-             const displayImgHeight = img.naturalHeight;
-             const relX = (x1 / displayImgWidth).toFixed(4);
-             const relY = (y1 / displayImgHeight).toFixed(4);
-             const relWidth = (width / displayImgWidth).toFixed(4);
-             const relHeight = (height / displayImgHeight).toFixed(4);
-             
-             document.getElementById('coord-display').innerHTML = `
-                 <strong>正在标注（相对位置）：</strong><br>
-                 X: ${relX}, Y: ${relY}<br>
-                 宽度: ${relWidth}, 高度: ${relHeight}
-             `;
+	             // 不展示坐标，避免用户困惑
+	             document.getElementById('coord-display').textContent = '正在标注文字区域...';
          }
 
          function endDrawing(event, img) {
@@ -3046,21 +3164,10 @@
                  templatePreviewCtx.textBaseline = 'top';
                  templatePreviewCtx.fillText('文字区域', textX, textY);
                  
-                 // 显示坐标信息（相对坐标）
-                 const endImgWidth = img.naturalWidth;
-                 const endImgHeight = img.naturalHeight;
-                 const endRelX = (x1 / endImgWidth).toFixed(4);
-                 const endRelY = (y1 / endImgHeight).toFixed(4);
-                 const endRelWidth = (width / endImgWidth).toFixed(4);
-                 const endRelHeight = (height / endImgHeight).toFixed(4);
-                 
-                 document.getElementById('coord-display').innerHTML = `
-                     <strong>文字区域已标注（相对位置）：</strong><br>
-                     X: ${endRelX}, Y: ${endRelY}<br>
-                     宽度: ${endRelWidth}, 高度: ${endRelHeight}
-                 `;
-             }
-         }
+	                 // 不展示坐标，避免用户困惑
+	                 document.getElementById('coord-display').textContent = '文字区域已标注，可以直接保存模板';
+	             }
+	         }
 
         // 提交模板
          async function submitTemplate() {
